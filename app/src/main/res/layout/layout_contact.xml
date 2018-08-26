@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Spinner
+        android:id="@+id/contact_type_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" >
+
+    </Spinner>
+
+    <EditText
+        android:id="@+id/contact_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toRightOf="@id/contact_type_spinner"
+        android:layout_toEndOf="@id/contact_type_spinner"
+        android:textSize="18sp"
+        android:hint="Contact"/>
+
+    <Button
+        android:id="@+id/delete_contact_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:drawableLeft="@android:drawable/ic_input_delete"
+        android:drawableStart="@android:drawable/ic_input_delete"
+        android:text="Delete" />
+
+</RelativeLayout>

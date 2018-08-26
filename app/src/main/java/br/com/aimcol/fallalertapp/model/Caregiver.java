@@ -1,6 +1,6 @@
 package br.com.aimcol.fallalertapp.model;
 
-import java.util.Map;
+import java.util.List;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
 public class Caregiver {
     //String key;
     String name;
-    Map<ContactType, String> contacts;
+    List<Contact> contacts;
 
     public String toStringToUser() {
         return name + ", contacts: " + contacts +'}';

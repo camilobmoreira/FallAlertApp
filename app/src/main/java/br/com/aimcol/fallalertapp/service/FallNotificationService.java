@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.aimcol.fallalertapp.model.Caregiver;
+import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.ContactType;
 import br.com.aimcol.fallalertapp.model.Elderly;
 
@@ -68,12 +69,10 @@ public class FallNotificationService extends IntentService {
         boolean success = false;
         String name = elderly.getName();
         for (Caregiver caregiver : elderly.getCaregivers()) {
-            for (Map.Entry<ContactType, String> entry : caregiver.getContacts().entrySet()) {
-                ContactType contactType = entry.getKey();
-                String contact = entry.getValue();
-                switch (contactType) {
+            for (Contact contact : caregiver.getContacts()) {
+                switch (contact.getType()) {
                     case SMS:
-                        this.sendSms(contact, "Someone fell down");
+                        this.sendSms(contact.getContact(), "Someone fell down");
                         break;
 //                    case EMAIL:
 //                        success = this.sendEmail(name, contact);
