@@ -4,12 +4,14 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 
 import com.google.gson.Gson;
 
@@ -22,6 +24,7 @@ import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.model.Caregiver;
 import br.com.aimcol.fallalertapp.model.ContactType;
 import br.com.aimcol.fallalertapp.model.Elderly;
+import br.com.aimcol.fallalertapp.service.ElderlyService;
 import br.com.aimcol.fallalertapp.service.FallDetectionService;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +49,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        Button addNewCaregiverButton = (Button) super.findViewById(R.id.add_caregiver_button);
+        addNewCaregiverButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newCaregiverIntent = new Intent(MainActivity.this, NewCaregiverActivity.class);
+                startActivityForResult(newCaregiverIntent, 0);
+            }
+        });
+
+        Button saveElderlyButton = (Button) super.findViewById(R.id.save_elderly_button);
+        saveElderlyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent elderlyServiceIntent = new Intent(MainActivity.this, ElderlyService.class);
+                startActivity(elderlyServiceIntent);
+            }
+        });
+
 
 
 
@@ -55,19 +76,40 @@ public class MainActivity extends AppCompatActivity {
         Map<ContactType, String> contacts = new HashMap<>();
         contacts.put(ContactType.SMS, "+5512999999999");
 
-        Caregiver caregiver = new Caregiver();
-        caregiver.setContacts(contacts);
+        Caregiver caregiver1 = new Caregiver();
+        caregiver1.setName("Caregiver Test");
+        caregiver1.setContacts(contacts);
+
+        Caregiver caregiver2 = new Caregiver();
+        caregiver2.setName("Caregiver Test2");
+        caregiver2.setContacts(contacts);
+
+        Caregiver caregiver3 = new Caregiver();
+        caregiver3.setName("Caregiver Test3");
+        caregiver3.setContacts(contacts);
 
         List<Caregiver> caregiverList = new ArrayList<>();
-        caregiverList.add(caregiver);
+        caregiverList.add(caregiver1);
+        caregiverList.add(caregiver2);
+        caregiverList.add(caregiver3);
 
         this.elderly = new Elderly();
-        this.elderly.setName("Teste");
+        this.elderly.setName("Elderly Test");
         this.elderly.setCaregivers(caregiverList);
 
         Intent fallDetectionServiceIntent = new Intent(this, FallDetectionService.class);
         fallDetectionServiceIntent.putExtra("elderlyJson", this.gson.toJson(this.elderly));
         this.getBaseContext().startService(fallDetectionServiceIntent);
+
+
+        ListView caregiverListView = (ListView) super.findViewById(R.id.caregiver_list_view);
+        List<String> list = new ArrayList<>();
+        for (Caregiver c: caregiverList) {
+            list.add(c.toStringToUser());
+        }
+        ArrayAdapter dataAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, list);
+        dataAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        caregiverListView.setAdapter(dataAdapter);
     }
 
     // Extract to another class

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainActivity">
+    tools:context=".activity.NewCaregiverActivity">
 
     <TableLayout
         android:id="@+id/elderly_registration_table_layout"
@@ -28,28 +28,15 @@
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <EditText
-                android:id="@+id/birth_edit_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="date"
-                android:hint="Date of birth"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/caregiver_text_view"
+                android:id="@+id/contact_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="Caregiver" />
+                android:text="Contacts" />
         </TableRow>
 
         <TableRow
@@ -57,35 +44,36 @@
             android:layout_height="match_parent" >
 
             <Button
-                android:id="@+id/add_caregiver_button"
+                android:id="@+id/add_contact_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add new caregiver"
+                android:text="Add new contact"
                 android:drawableLeft="@android:drawable/ic_input_add"
                 android:drawableStart="@android:drawable/ic_input_add"/>
         </TableRow>
 
         <TableRow
-            android:id="@+id/caregiver_list_table_row"
+            android:id="@+id/contacts_list_table_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
             <ListView
-                android:id="@+id/caregiver_list_view"
+                android:id="@+id/contacts_list_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
-
         </TableRow>
+
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
             <Button
-                android:id="@+id/save_elderly_button"
+                android:id="@+id/save_caregiver_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save" />
         </TableRow>
     </TableLayout>
+
 </android.support.constraint.ConstraintLayout>

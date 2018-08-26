@@ -2,6 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="br.com.aimcol.fallalertapp">
 
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.sensor.gyroscope"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,12 +26,14 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.FallDetectionService" android:exported="false"/>
-        <service android:name=".service.FallNotificationService" android:exported="false"/>
-    </application>
-    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
-    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false"/>
+        <service
+            android:name=".service.FallDetectionService"
+            android:exported="false" />
+        <service
+            android:name=".service.FallNotificationService"
+            android:exported="false" />
 
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+        <activity android:name=".activity.NewCaregiverActivity"></activity>
+    </application>
 
 </manifest>

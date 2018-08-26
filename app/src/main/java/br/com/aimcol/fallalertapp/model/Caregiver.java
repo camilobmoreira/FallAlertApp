@@ -9,4 +9,8 @@ public class Caregiver {
     //String key;
     String name;
     Map<ContactType, String> contacts;
+
+    public String toStringToUser() {
+        return name + ", contacts: " + contacts +'}';
+    }
 }
