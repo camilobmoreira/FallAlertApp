@@ -17,11 +17,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.util.List;
-import java.util.Map;
 
 import br.com.aimcol.fallalertapp.model.Caregiver;
 import br.com.aimcol.fallalertapp.model.Contact;
-import br.com.aimcol.fallalertapp.model.ContactType;
 import br.com.aimcol.fallalertapp.model.Elderly;
 
 public class FallNotificationService extends IntentService {
@@ -29,7 +27,7 @@ public class FallNotificationService extends IntentService {
 
     public static final String SMS_DELIVERED = "SMS_DELIVERED";
     public static final String SMS_SENT = "SMS_SENT";
-    private Elderly elderly;
+//    private Elderly elderly;
     private Gson gson = new Gson();
     private BroadcastReceiver sentStatusReceiver;
     private BroadcastReceiver deliveredStatusReceiver;
@@ -49,19 +47,14 @@ public class FallNotificationService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (this.elderly == null) {
-            String elderlyJson = intent.getStringExtra("elderlyJson");
-            this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
-        }
+
     }
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        if (this.elderly == null) {
-            String elderlyJson = intent.getStringExtra("elderlyJson");
-            this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
-        }
-        this.sendNotification(this.elderly);
+        String elderlyJson = intent.getStringExtra("elderlyJson");
+        Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
+        this.sendNotification(elderly);
         return super.onStartCommand(intent, flags, startId);
     }
 

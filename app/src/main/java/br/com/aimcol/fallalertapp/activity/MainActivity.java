@@ -74,33 +74,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-
         this.gson = new Gson();
 
-//        List<Contact> contacts = new ArrayList<>();
-//        contacts.add(new Contact(ContactType.SMS, "2342342"));
-//
-//        Caregiver caregiver1 = new Caregiver();
-//        caregiver1.setName("Caregiver Test");
-//        caregiver1.setContacts(contacts);
-//
-//        Caregiver caregiver2 = new Caregiver();
-//        caregiver2.setName("Caregiver Test2");
-//        caregiver2.setContacts(contacts);
-//
-//        Caregiver caregiver3 = new Caregiver();
-//        caregiver3.setName("Caregiver Test3");
-//        caregiver3.setContacts(contacts);
-//
         List<Caregiver> caregiverList = new ArrayList<>();
-//        caregiverList.add(caregiver1);
-//        caregiverList.add(caregiver2);
-//        caregiverList.add(caregiver3);
-//
+
         this.elderly = new Elderly();
-//        this.elderly.setName("Elderly Test");
         this.elderly.setCaregivers(caregiverList);
 
         Intent fallDetectionServiceIntent = new Intent(this, FallDetectionService.class);
