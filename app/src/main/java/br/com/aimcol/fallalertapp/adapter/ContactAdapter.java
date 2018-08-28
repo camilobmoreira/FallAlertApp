@@ -47,6 +47,10 @@ public class ContactAdapter extends BaseAdapter implements ListAdapter {
         return 0;
     }
 
+    public List<Contact> getList() {
+        return this.list;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -69,8 +73,18 @@ public class ContactAdapter extends BaseAdapter implements ListAdapter {
 
         EditText contactEditText = (EditText) view.findViewById(R.id.contact_edit_text);
         contactEditText.setText(contact.getContact());
-
-
+        // fixme workaround
+        contactEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    String contactString = ((EditText) v).getText().toString();
+                    if (!contactString.equals(contact.getContact())) {
+                        contact.setContact(contactString);
+                    }
+                }
+            }
+        });
 
         Button deleteBtn = (Button)view.findViewById(R.id.delete_contact_button);
         deleteBtn.setOnClickListener(new View.OnClickListener(){

@@ -9,8 +9,4 @@ public class Caregiver {
     //String key;
     String name;
     List<Contact> contacts;
-
-    public String toStringToUser() {
-        return name + ", contacts: " + contacts +'}';
-    }
 }
