@@ -36,7 +36,10 @@
             android:name=".service.FallNotificationService"
             android:exported="false" />
 
-        <activity android:name=".activity.NewCaregiverActivity"></activity>
+        <activity
+            android:name=".activity.NewCaregiverActivity" />
+        <activity
+            android:name=".activity.NewElderlyActivity" />
     </application>
 
 </manifest>

@@ -63,7 +63,7 @@ public class NewCaregiverActivity extends AppCompatActivity {
                 caregiver.setName(nameEditText.getText().toString());
 
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra("caregiverJson", gson.toJson(caregiver));
+                resultIntent.putExtra(Caregiver.CAREGIVER_JSON, gson.toJson(caregiver));
                 setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }

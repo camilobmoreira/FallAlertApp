@@ -6,8 +6,11 @@ import lombok.Data;
 
 @Data
 public class Elderly {
-    String key;
-    String name;
-//    LocalDate birthday;
-    List<Caregiver> caregivers;
+
+    public static final String ELDERLY_JSON = "elderlyJson";
+
+    private String key;
+    private String name;
+//  private LocalDate birthday;
+    private List<Caregiver> caregivers;
 }

@@ -89,7 +89,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
                     Toast.makeText(this, "Queda", Toast.LENGTH_LONG).show();
 
                     Intent fallNotificationServiceIntent = new Intent(this, FallNotificationService.class);
-                    fallNotificationServiceIntent.putExtra("elderlyJson", this.gson.toJson(this.elderly));
+                    fallNotificationServiceIntent.putExtra(Elderly.ELDERLY_JSON, this.gson.toJson(this.elderly));
                     this.getBaseContext().startService(fallNotificationServiceIntent);
                 }
             }
@@ -164,7 +164,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (this.elderly == null) {
-            String elderlyJson = intent.getStringExtra("elderlyJson");
+            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
             this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
         }
     }
@@ -174,7 +174,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
                               int flags,
                               int startId) {
         if (this.elderly == null) {
-            String elderlyJson = intent.getStringExtra("elderlyJson");
+            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
             this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
         }
 

@@ -21,6 +21,7 @@ import java.util.List;
 import br.com.aimcol.fallalertapp.model.Caregiver;
 import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.Elderly;
+import br.com.aimcol.fallalertapp.util.PermissionUtils;
 
 public class FallNotificationService extends IntentService {
 
@@ -52,7 +53,7 @@ public class FallNotificationService extends IntentService {
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        String elderlyJson = intent.getStringExtra("elderlyJson");
+        String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
         Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
         this.sendNotification(elderly);
         return super.onStartCommand(intent, flags, startId);
@@ -81,7 +82,7 @@ public class FallNotificationService extends IntentService {
 
     private void sendSms(String contact, String message) {
         //fixme check for last sms sent so it doesn't send too many texts in a short period of time
-        if (this.checkPermission() && false) {
+        if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS) && false) {
             if (contact.isEmpty()) {
                 Toast.makeText(this.getApplicationContext(), "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
             } else {
@@ -100,11 +101,6 @@ public class FallNotificationService extends IntentService {
         } else {
             throw new RuntimeException("No permission to send SMS");
         }
-    }
-
-    // Extract to another class
-    private boolean checkPermission() {
-        return (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED);
     }
 
     public void registerBroadcastReceiverForSms() {

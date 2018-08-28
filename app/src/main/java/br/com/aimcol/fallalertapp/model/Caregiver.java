@@ -6,7 +6,9 @@ import lombok.Data;
 
 @Data
 public class Caregiver {
-    //String key;
-    String name;
-    List<Contact> contacts;
+    public static final String CAREGIVER_JSON = "caregiverJson";
+
+    //private String key;
+    private String name;
+    private List<Contact> contacts;
 }

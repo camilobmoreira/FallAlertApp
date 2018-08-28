@@ -29,14 +29,15 @@ public class ElderlyService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 //        if (this.elderly == null) {
-//            String elderlyJson = intent.getStringExtra("elderlyJson");
+//            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
 //            this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
 //        }
     }
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        String elderlyJson = intent.getStringExtra("elderlyJson");
+        this.gson = new Gson();
+        String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
         Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
 
         CrudAction action = CrudAction.valueOf(intent.getStringExtra("crudAction"));
