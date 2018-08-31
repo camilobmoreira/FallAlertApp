@@ -52,7 +52,10 @@ public class FallNotificationService extends IntentService {
     }
 
     @Override
-    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+    public int onStartCommand(@Nullable Intent intent,
+                              int flags,
+                              int startId) {
+
         String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
         Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
         this.sendNotification(elderly);
@@ -80,7 +83,9 @@ public class FallNotificationService extends IntentService {
         return success;
     }
 
-    private void sendSms(String contact, String message) {
+    private void sendSms(String contact,
+                         String message) {
+
         //fixme check for last sms sent so it doesn't send too many texts in a short period of time
         if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS) && false) {
             if (contact.isEmpty()) {

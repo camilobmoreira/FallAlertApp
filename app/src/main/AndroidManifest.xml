@@ -23,7 +23,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity">
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,7 +34,7 @@
         </activity>
 
         <service
-            android:name=".service.ElderlyService"
+            android:name=".service.UserService"
             android:exported="false" />
         <service
             android:name=".service.FallDetectionService"
@@ -41,11 +43,9 @@
             android:name=".service.FallNotificationService"
             android:exported="false" />
 
+        <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.NewCaregiverActivity" />
         <activity android:name=".activity.NewElderlyActivity" />
-        <activity
-            android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login"/>
     </application>
 
 </manifest>

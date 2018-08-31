@@ -30,7 +30,8 @@ import com.google.gson.Gson;
 
 import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.model.User;
-//import br.com.aimcol.fallalertapp.service.UserService;
+import br.com.aimcol.fallalertapp.service.UserService;
+import br.com.aimcol.fallalertapp.util.CrudAction;
 
 /**
  * A login screen that offers login via email/password.
@@ -56,6 +57,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         FirebaseUser currentUser = this.mAuth.getCurrentUser();
+        if (currentUser != null) {
+            User user = UserService.toUser(currentUser);
+            String userJson = LoginActivity.this.gson.toJson(user);
+            //UserService.startUserService(userJson, CrudAction.UPDATE, this);
+            MainActivity.startMainActivitySendUser(userJson, this);
+        }
 
     }
 
@@ -72,9 +79,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         this.mAuth = FirebaseAuth.getInstance();
 
         // Set up the login form.
-        this.mEmailView = (EditText) super.findViewById(R.id.email);
+        this.mEmailView = super.findViewById(R.id.email);
 
-        this.mPasswordView = (EditText) super.findViewById(R.id.password);
+        this.mPasswordView = super.findViewById(R.id.password);
         this.mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -86,9 +93,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        this.mPasswordConfirmationView = (EditText) super.findViewById(R.id.password_confirmation);
+        this.mPasswordConfirmationView = super.findViewById(R.id.password_confirmation);
 
-        Button mEmailSignInButton = (Button) super.findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = super.findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,13 +103,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignUpButton = (Button) super.findViewById(R.id.email_sign_up_button);
+        Button mEmailSignUpButton = super.findViewById(R.id.email_sign_up_button);
         mEmailSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (LoginActivity.this.mPasswordConfirmationView.getVisibility() == View.GONE) {
                     LoginActivity.this.mPasswordConfirmationView.setVisibility(View.VISIBLE);
-                    LoginActivity.this.mPasswordConfirmationView.setError(LoginActivity.super.getString(R.string.error_field_required));
                 } else {
                     LoginActivity.this.attemptSignUp();
                 }
@@ -112,7 +118,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         this.mLoginFormView = super.findViewById(R.id.login_form);
         this.mProgressView = super.findViewById(R.id.login_progress);
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -136,15 +141,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
+                        // Sign in success
                         Log.d("login", "signInWithEmail:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-//                                updateUI(user);
+                        FirebaseUser currentUser = LoginActivity.this.mAuth.getCurrentUser();
+                        User user = UserService.toUser(currentUser);
+                        String userJson = LoginActivity.this.gson.toJson(user);
+                        //LoginActivity.this.startUserService(userJson, CrudAction.READ);
+                        MainActivity.startMainActivitySendUser(userJson, LoginActivity.this);
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("login", "signInWithEmail:failure", task.getException());
                         Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                        mPasswordView.setText("");
+                        LoginActivity.this.showProgress(false);
+                        LoginActivity.this.mPasswordView.setText("");
                     }
                 }
             });
@@ -157,46 +166,52 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         String passwordConfirmation = this.mPasswordConfirmationView.getText().toString();
 
         if (this.isEmailAndPasswordValid(email, password, passwordConfirmation)) {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // Show a progress spinner, and kick off a background task to perform the user sign up attempt.
             this.showProgress(true);
             this.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
+                        // Sign up success
                         Log.d("signup", "createUserWithEmail:success");
-                        FirebaseUser currentUser = mAuth.getCurrentUser();
-                        User user = new User();
-                        user.setEmail(currentUser.getEmail());
-//                        Intent userServiceIntent = new Intent(LoginActivity.this, UserService.class);
-//                        userServiceIntent.putExtra(User.USER_JSON, LoginActivity.this.gson.toJson(user));
-//                        LoginActivity.this.getBaseContext().startService(userServiceIntent);
+                        FirebaseUser currentUser = LoginActivity.this.mAuth.getCurrentUser();
+                        User user = UserService.toUser(currentUser);
+                        String userJson = LoginActivity.this.gson.toJson(user);
+                        UserService.startUserService(userJson, CrudAction.CREATE, LoginActivity.this);
+                        MainActivity.startMainActivitySendUser(userJson, LoginActivity.this);
+
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // If sign up fails, display a message to the user.
                         Log.w("signup", "createUserWithEmail:failure", task.getException());
                         Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-//                        updateUI(null);
+                        LoginActivity.this.showProgress(false);
+                        LoginActivity.this.mPasswordView.setText("");
+                        LoginActivity.this.mPasswordConfirmationView.setText("");
                     }
                 }
             });
         }
     }
 
-    private boolean isEmailAndPasswordValid(String email, String password, String passwordConfirmation) {
+    private boolean isEmailAndPasswordValid(String email,
+                                            String password,
+                                            String passwordConfirmation) {
+
         boolean valid = true;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(password)) {
-            this.mPasswordView.setError(getString(R.string.error_field_required));
+            this.mPasswordView.setError(super.getString(R.string.error_field_required));
             focusView = this.mPasswordView;
             valid = false;
         } else if (!this.isPasswordValid(password)) {
-            this.mPasswordView.setError(getString(R.string.error_invalid_password));
+            this.mPasswordView.setError(super.getString(R.string.error_invalid_password));
             focusView = this.mPasswordView;
             valid = false;
         }
+
+        // Check if password confirmation matches the password
         if (this.mPasswordConfirmationView.getVisibility() == View.VISIBLE && !password.equals(passwordConfirmation)) {
             this.mPasswordView.setError(super.getString(R.string.error_passwords_dont_match));
             this.mPasswordConfirmationView.setError(super.getString(R.string.error_passwords_dont_match));
@@ -206,17 +221,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
-            this.mEmailView.setError(getString(R.string.error_field_required));
+            this.mEmailView.setError(super.getString(R.string.error_field_required));
             focusView = this.mEmailView;
             valid = false;
         } else if (!this.isEmailValid(email)) {
-            this.mEmailView.setError(getString(R.string.error_invalid_email));
+            this.mEmailView.setError(super.getString(R.string.error_invalid_email));
             focusView = this.mEmailView;
             valid = false;
         }
         if (!valid) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
+            // There was an error; don't attempt sign in/up and focus the first form field with an error.
             focusView.requestFocus();
         }
 
@@ -230,7 +244,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 6;
     }
 
     /**
@@ -263,12 +277,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+    public Loader<Cursor> onCreateLoader(int i,
+                                         Bundle bundle) {
         return null;
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+    public void onLoadFinished(Loader<Cursor> cursorLoader,
+                               Cursor cursor) {
 
     }
 

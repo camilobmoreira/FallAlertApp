@@ -18,7 +18,6 @@ import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.adapter.CaregiverAdapter;
 import br.com.aimcol.fallalertapp.model.Caregiver;
 import br.com.aimcol.fallalertapp.model.Elderly;
-import br.com.aimcol.fallalertapp.service.ElderlyService;
 
 public class NewElderlyActivity extends AppCompatActivity {
 
@@ -29,7 +28,7 @@ public class NewElderlyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_elderly);
+        super.setContentView(R.layout.activity_new_elderly);
 
         // Initiate variables
         this.gson = new Gson();
@@ -39,37 +38,37 @@ public class NewElderlyActivity extends AppCompatActivity {
             this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
         }
 
-        Button addNewCaregiverButton = (Button) super.findViewById(R.id.add_caregiver_button);
+        Button addNewCaregiverButton = super.findViewById(R.id.add_caregiver_button);
         addNewCaregiverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent newCaregiverIntent = new Intent(NewElderlyActivity.this, NewCaregiverActivity.class);
-                startActivityForResult(newCaregiverIntent, 1);
+                NewElderlyActivity.super.startActivityForResult(newCaregiverIntent, 1);
             }
         });
 
-        Button saveElderlyButton = (Button) super.findViewById(R.id.save_elderly_button);
+        Button saveElderlyButton = super.findViewById(R.id.save_elderly_button);
         saveElderlyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent elderlyServiceIntent = new Intent(NewElderlyActivity.this, ElderlyService.class);
-                elderlyServiceIntent.putExtra(Elderly.ELDERLY_JSON, gson.toJson(elderly));
-
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra(Elderly.ELDERLY_JSON, gson.toJson(elderly));
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+                resultIntent.putExtra(Elderly.ELDERLY_JSON, NewElderlyActivity.this.gson.toJson(NewElderlyActivity.this.elderly));
+                NewElderlyActivity.this.setResult(Activity.RESULT_OK, resultIntent);
+                NewElderlyActivity.this.finish();
             }
         });
 
         List<Caregiver> caregiverList = new ArrayList<>();
         this.elderly.setCaregivers(caregiverList);
-        this.caregiverListView = (ListView) super.findViewById(R.id.caregiver_list_view);
+        this.caregiverListView = super.findViewById(R.id.caregiver_list_view);
         this.caregiverListView.setAdapter(new CaregiverAdapter(caregiverList, this));
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode,
+                                 int resultCode,
+                                 Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == 1) {
             String caregiverJson = data.getStringExtra(Caregiver.CAREGIVER_JSON);

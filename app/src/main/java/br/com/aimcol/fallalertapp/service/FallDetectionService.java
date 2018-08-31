@@ -77,7 +77,10 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.isFallDetected(x, y, z);
     }
 
-    private void isFallDetected(double x, double y, double z) {
+    private void isFallDetected(double x,
+                                double y,
+                                double z) {
+
         double acceleration = this.calculateAcceleration(x, y, z);// - SensorManager.GRAVITY_EARTH;
         this.addAccelerometerValuesToList(x, y, z, acceleration);
 
@@ -173,6 +176,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
     public int onStartCommand(Intent intent,
                               int flags,
                               int startId) {
+
         if (this.elderly == null) {
             String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
             this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
@@ -190,5 +194,13 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.mSensorManager.registerListener(this, this.mAccelerometer, ACCELEROMETER_SAMPLING_PERIOD);
 
         return Service.START_STICKY;
+    }
+
+    public static void startFallDetectionService(String elderlyJson,
+                                                 Context context) {
+
+        Intent fallDetectionServiceIntent = new Intent(context, FallDetectionService.class);
+        fallDetectionServiceIntent.putExtra(Elderly.ELDERLY_JSON, elderlyJson);
+        context.startService(fallDetectionServiceIntent);
     }
 }

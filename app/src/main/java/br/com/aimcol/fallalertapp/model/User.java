@@ -7,7 +7,7 @@ public class User {
 
     public static final String USER_JSON = "userJson";
 
-    private String id;
+    private String key;
     private String email;
     private Person person;
 }
