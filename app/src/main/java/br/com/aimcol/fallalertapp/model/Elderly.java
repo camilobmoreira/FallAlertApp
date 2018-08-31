@@ -5,12 +5,10 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Elderly {
+public class Elderly extends Person {
 
     public static final String ELDERLY_JSON = "elderlyJson";
 
-    private String key;
-    private String name;
 //  private LocalDate birthday;
     private List<Caregiver> caregivers;
 }
