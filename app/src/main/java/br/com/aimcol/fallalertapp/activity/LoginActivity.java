@@ -60,7 +60,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (currentUser != null) {
             User user = UserService.toUser(currentUser);
             String userJson = LoginActivity.this.gson.toJson(user);
-            //UserService.startUserService(userJson, CrudAction.UPDATE, this);
+            UserService.startUserService(userJson, CrudAction.READ, this);
+//            UserService.startUserService(userJson, CrudAction.UPDATE, this);
             MainActivity.startMainActivitySendUser(userJson, this);
         }
 

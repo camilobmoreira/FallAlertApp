@@ -3,11 +3,23 @@ package br.com.aimcol.fallalertapp.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.HashMap;
 
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Person;
@@ -17,6 +29,7 @@ import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class UserService extends IntentService {
 
+    private DatabaseReference mDatabase;
     private Gson gson;
 
     public UserService() {
@@ -42,6 +55,8 @@ public class UserService extends IntentService {
                               int flags,
                               int startId) {
 
+        this.mDatabase = FirebaseDatabase.getInstance().getReference();
+
         RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(Person.class, "type")
                 .registerSubtype(Elderly.class, "elderly");
@@ -56,11 +71,13 @@ public class UserService extends IntentService {
                 user = this.save(user);
                 break;
             case READ:
+                user = this.load(user.getEmail());
                 break;
             case UPDATE:
                 user = this.update(user);
                 break;
             case DELETE:
+                this.delete(user);
                 break;
         }
 
@@ -68,11 +85,53 @@ public class UserService extends IntentService {
     }
 
     private User save(User user) {
-        return user;
+        String key = this.mDatabase.child("user").push().getKey();
+        user.setKey(key);
+
+        return this.update(user);
+    }
+
+    private User load(String email) {
+        this.mDatabase.child("user").orderByChild("email").equalTo(email).limitToFirst(1).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    UserService.this.gson.fromJson(snapshot.getValue().toString(), User.class);
+                    // fixme send this with a broadcast or something like that to the return of the load method
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        return null;
     }
 
     private User update(User user) {
+        Task<Void> task = this.mDatabase.child("user").child(user.getKey()).setValue(user);
+
+        // fixme add some event listener that has onComplete method because this is always returning false
+        if (task.isSuccessful()) {
+            Toast.makeText(this, "Success", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show();
+//            Log.e("update", task.getException().getMessage());
+        }
+
         return user;
+    }
+
+    private void delete(User user) {
+        Task<Void> task = this.mDatabase.child("user").child(user.getKey()).removeValue();
+
+        if (task.isSuccessful()) {
+            Toast.makeText(this, "Success", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show();
+            Log.e("update", task.getException().getMessage());
+        }
     }
 
     public static User toUser(FirebaseUser currentUser) {
