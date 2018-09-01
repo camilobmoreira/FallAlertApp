@@ -9,6 +9,10 @@ public class Elderly extends Person {
 
     public static final String ELDERLY_JSON = "elderlyJson";
 
+    public Elderly() {
+        super("elderly");
+    }
+
 //  private LocalDate birthday;
     private List<Caregiver> caregivers;
 }

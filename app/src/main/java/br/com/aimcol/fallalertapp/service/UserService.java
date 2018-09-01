@@ -7,9 +7,13 @@ import android.support.annotation.Nullable;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import br.com.aimcol.fallalertapp.model.Elderly;
+import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.util.CrudAction;
+import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class UserService extends IntentService {
 
@@ -38,7 +42,11 @@ public class UserService extends IntentService {
                               int flags,
                               int startId) {
 
-        this.gson = new Gson();
+        RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(Person.class, "type")
+                .registerSubtype(Elderly.class, "elderly");
+        this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
+
         String userJson = intent.getStringExtra(User.USER_JSON);
         User user = this.gson.fromJson(userJson, User.class);
 
