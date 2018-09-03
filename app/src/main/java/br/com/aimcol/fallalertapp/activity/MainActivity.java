@@ -12,8 +12,13 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.util.List;
+
 import br.com.aimcol.fallalertapp.R;
+import br.com.aimcol.fallalertapp.model.Caregiver;
+import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.Elderly;
+import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.service.FallDetectionService;
 import br.com.aimcol.fallalertapp.service.UserService;
@@ -65,6 +70,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isReadyToStartFallDetectionService() {
+        Person person = this.user.getPerson();
+        if (person != null) {
+            Elderly elderly = (Elderly) person;
+            List<Caregiver> caregivers = elderly.getCaregivers();
+            if (caregivers != null && !caregivers.isEmpty()) {
+                for (Caregiver caregiver : caregivers) {
+                    List<Contact> contacts = caregiver.getContacts();
+                    if (contacts != null && !contacts.isEmpty()) {
+                        for (Contact contact : contacts) {
+                            if (contact.getType() != null && contact.getContact() != null) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -99,15 +121,5 @@ public class MainActivity extends AppCompatActivity {
         Intent mainActivityIntent = new Intent(context, MainActivity.class);
         mainActivityIntent.putExtra(User.USER_JSON, userJson);
         context.startActivity(mainActivityIntent);
-    }
-
-    private void showMessageOKCancel(String message,
-                                     DialogInterface.OnClickListener okListener) {
-        new android.support.v7.app.AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
     }
 }

@@ -26,8 +26,8 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
 
     private static final int ACCELEROMETER_SAMPLING_PERIOD = 1000000;
-    public static final double CSV_THRESHOLD = 23;
-    public static final double CAV_THRESHOLD = 18;
+    public static final double CSV_THRESHOLD = 0;//23;
+    public static final double CAV_THRESHOLD = 0;//18;
     public static final double CCA_THRESHOLD = 0;//65.5;
 
     private SensorManager mSensorManager;

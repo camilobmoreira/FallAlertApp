@@ -8,14 +8,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.util.Calendar;
 import java.util.List;
 
 import br.com.aimcol.fallalertapp.model.Caregiver;
@@ -28,10 +27,14 @@ public class FallNotificationService extends IntentService {
 
     public static final String SMS_DELIVERED = "SMS_DELIVERED";
     public static final String SMS_SENT = "SMS_SENT";
-//    private Elderly elderly;
+
+    private Long lastSentInMillis;
+    private Long minTimeToNotifyAgain;
     private Gson gson = new Gson();
     private BroadcastReceiver sentStatusReceiver;
     private BroadcastReceiver deliveredStatusReceiver;
+//    private AlertDialog mAlertDialog;
+//    private Handler mHandler;
 
     public FallNotificationService() {
         super(".FallNotificationService");
@@ -56,65 +59,75 @@ public class FallNotificationService extends IntentService {
                               int flags,
                               int startId) {
 
-        String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
-        Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
-        this.sendNotification(elderly);
+        this.minTimeToNotifyAgain = 300000L;
+
+        if (intent != null) {
+            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
+            Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
+            this.sendNotification(elderly);
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private boolean sendNotification(Elderly elderly) {
-        boolean success = false;
-        String name = elderly.getName();
-        for (Caregiver caregiver : elderly.getCaregivers()) {
-            for (Contact contact : caregiver.getContacts()) {
-                switch (contact.getType()) {
-                    case SMS:
-                        this.sendSms(contact.getContact(), "Someone fell down");
-                        break;
+    private void sendNotification(Elderly elderly) {
+        if (this.isItOkayToNotifyAgain()) {
+            for (Caregiver caregiver : elderly.getCaregivers()) {
+                for (Contact contact : caregiver.getContacts()) {
+                    switch (contact.getType()) {
+                        case SMS:
+                            this.sendSms(contact.getContact(), "Someone fell down");
+                            break;
 //                    case EMAIL:
 //                        success = this.sendEmail(name, contact);
 //                        break;
 //                    case WHATSAPP:
 //                        success = this.sendWhatsapp(name, contact);
 //                        break;
+                    }
                 }
             }
+        } else {
+            Toast.makeText(this.getApplicationContext(), "Not long enough since last notification", Toast.LENGTH_SHORT).show();
         }
-        return success;
     }
 
     private void sendSms(String contact,
                          String message) {
 
-        //fixme check for last sms sent so it doesn't send too many texts in a short period of time
-        if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS) && false) {
+
+        if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS)) {
             if (contact.isEmpty()) {
                 Toast.makeText(this.getApplicationContext(), "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
             } else {
 
                 SmsManager sms = SmsManager.getDefault();
-                // if message length is too long messages are divided
+                // if message length is too long, messages are divided
                 List<String> messages = sms.divideMessage(message);
 
                 for (String msg : messages) {
-                    PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent(SMS_SENT), 0);
-                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(this, 0, new Intent(SMS_DELIVERED), 0);
+                    PendingIntent sentIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
+                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
                     sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
                 }
-                this.registerBroadcastReceiverForSms();
+                FallNotificationService.this.lastSentInMillis = Calendar.getInstance().getTimeInMillis();
+                FallNotificationService.this.registerBroadcastReceiverForSms();
             }
         } else {
             throw new RuntimeException("No permission to send SMS");
         }
     }
 
+    private boolean isItOkayToNotifyAgain() {
+        return this.lastSentInMillis == null || (this.lastSentInMillis + this.minTimeToNotifyAgain) < Calendar.getInstance().getTimeInMillis();
+    }
+
     public void registerBroadcastReceiverForSms() {
-        sentStatusReceiver = new BroadcastReceiver() {
+        this.sentStatusReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 String message = "Unknown Error";
-                switch (getResultCode()) {
+                switch (this.getResultCode()) {
                     case Activity.RESULT_OK:
                         message = "Message Sent Successfully !!";
                         break;
@@ -133,30 +146,32 @@ public class FallNotificationService extends IntentService {
                     default:
                         break;
                 }
+                Toast.makeText(FallNotificationService.this.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
             }
         };
-        deliveredStatusReceiver = new BroadcastReceiver() {
+        this.deliveredStatusReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 String message = "Message Not Delivered";
-                switch (getResultCode()) {
+                switch (this.getResultCode()) {
                     case Activity.RESULT_OK:
                         message = "Message Delivered Successfully";
                         break;
                     case Activity.RESULT_CANCELED:
                         break;
                 }
+                Toast.makeText(FallNotificationService.this.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
             }
         };
-        this.registerReceiver(sentStatusReceiver, new IntentFilter(SMS_SENT));
-        this.registerReceiver(deliveredStatusReceiver, new IntentFilter(SMS_DELIVERED));
+        this.registerReceiver(this.sentStatusReceiver, new IntentFilter(SMS_SENT));
+        this.registerReceiver(this.deliveredStatusReceiver, new IntentFilter(SMS_DELIVERED));
     }
 
 
     public void unregisterBroadcastReceiverForSms() {
-        this.unregisterReceiver(sentStatusReceiver);
-        this.unregisterReceiver(deliveredStatusReceiver);
+        this.unregisterReceiver(this.sentStatusReceiver);
+        this.unregisterReceiver(this.deliveredStatusReceiver);
     }
 
 //    private boolean sendWhatsapp(String name,
@@ -196,5 +211,14 @@ public class FallNotificationService extends IntentService {
 //            e.printStackTrace();
 //            return false;
 //        }
+//    }
+
+//    private AlertDialog showMessageOKCancel(String message,
+//                                            DialogInterface.OnClickListener okListener, DialogInterface.OnClickListener cancelListener) {
+//        return new android.support.v7.app.AlertDialog.Builder(this)
+//                .setMessage(message)
+//                .setPositiveButton("I did", okListener)
+//                .setNegativeButton("I did not", cancelListener)
+//                .create();
 //    }
 }
