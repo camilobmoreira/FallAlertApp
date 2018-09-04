@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,8 +17,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.util.HashMap;
 
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Person;
@@ -29,6 +26,7 @@ import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class UserService extends IntentService {
 
+    public static final String USER_SERVICE_ACTION_LOAD = "UserService#load";
     private DatabaseReference mDatabase;
     private Gson gson;
 
@@ -59,7 +57,7 @@ public class UserService extends IntentService {
 
         RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(Person.class, "type")
-                .registerSubtype(Elderly.class, "elderly");
+                .registerSubtype(Elderly.class, Elderly.class.getSimpleName());
         this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
 
         String userJson = intent.getStringExtra(User.USER_JSON);
@@ -71,7 +69,7 @@ public class UserService extends IntentService {
                 user = this.save(user);
                 break;
             case READ:
-                user = this.load(user.getEmail());
+                this.load(user.getEmail());
                 break;
             case UPDATE:
                 user = this.update(user);
@@ -91,13 +89,18 @@ public class UserService extends IntentService {
         return this.update(user);
     }
 
-    private User load(String email) {
+    private void load(String email) {
         this.mDatabase.child("user").orderByChild("email").equalTo(email).limitToFirst(1).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    UserService.this.gson.fromJson(snapshot.getValue().toString(), User.class);
-                    // fixme send this with a broadcast or something like that to the return of the load method
+                    Object value = snapshot.getValue();
+                    if (value != null) {
+                        Intent loadResponseIntent =  new Intent();
+                        loadResponseIntent.setAction(USER_SERVICE_ACTION_LOAD);
+                        loadResponseIntent.putExtra(User.USER_JSON, value.toString());
+                        UserService.this.sendBroadcast(loadResponseIntent);
+                    }
                 }
             }
 
@@ -106,7 +109,6 @@ public class UserService extends IntentService {
 
             }
         });
-        return null;
     }
 
     private User update(User user) {

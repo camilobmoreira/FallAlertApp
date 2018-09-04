@@ -59,7 +59,7 @@ public class FallNotificationService extends IntentService {
                               int flags,
                               int startId) {
 
-        this.minTimeToNotifyAgain = 300000L;
+        this.minTimeToNotifyAgain = 3000000L;
 
         if (intent != null) {
             String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
@@ -94,7 +94,6 @@ public class FallNotificationService extends IntentService {
     private void sendSms(String contact,
                          String message) {
 
-
         if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS)) {
             if (contact.isEmpty()) {
                 Toast.makeText(this.getApplicationContext(), "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
@@ -105,12 +104,12 @@ public class FallNotificationService extends IntentService {
                 List<String> messages = sms.divideMessage(message);
 
                 for (String msg : messages) {
-                    PendingIntent sentIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
-                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
-                    sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
+//                    PendingIntent sentIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
+//                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
+//                    sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
                 }
                 FallNotificationService.this.lastSentInMillis = Calendar.getInstance().getTimeInMillis();
-                FallNotificationService.this.registerBroadcastReceiverForSms();
+//                FallNotificationService.this.registerBroadcastReceiverForSms();
             }
         } else {
             throw new RuntimeException("No permission to send SMS");

@@ -3,7 +3,6 @@ package br.com.aimcol.fallalertapp.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -11,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.service.FallDetectionService;
 import br.com.aimcol.fallalertapp.service.UserService;
 import br.com.aimcol.fallalertapp.util.CrudAction;
+import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
         this.requestSendSMSPermission();
 
         // Initiate variables
-        this.gson = new Gson();
+        RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(Person.class, "type")
+                .registerSubtype(Elderly.class, Elderly.class.getSimpleName());
+        this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
 
         Intent intent = super.getIntent();
         if (this.user == null) {
@@ -56,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
         // Initiate FallDetectionService
         if (this.isReadyToStartFallDetectionService()) {
             FallDetectionService.startFallDetectionService(elderlyJson, this);
+            this.setTextViewTo("Fall Detection Service Running");
+        } else {
+            //fixme remove from else and set the TextViews text to Elderly properties for editing an existing Elderly
+            this.startNewElderlyActivity(elderlyJson, this);
         }
-
-        this.startNewElderlyActivity(elderlyJson, this);
     }
 
     private void startNewElderlyActivity(String elderlyJson,
@@ -70,23 +76,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isReadyToStartFallDetectionService() {
-        Person person = this.user.getPerson();
-        if (person != null) {
-            Elderly elderly = (Elderly) person;
-            List<Caregiver> caregivers = elderly.getCaregivers();
-            if (caregivers != null && !caregivers.isEmpty()) {
-                for (Caregiver caregiver : caregivers) {
-                    List<Contact> contacts = caregiver.getContacts();
-                    if (contacts != null && !contacts.isEmpty()) {
-                        for (Contact contact : contacts) {
-                            if (contact.getType() != null && contact.getContact() != null) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//        Person person = this.user.getPerson();
+//        if (person != null) {
+//            Elderly elderly = (Elderly) person;
+//            List<Caregiver> caregivers = elderly.getCaregivers();
+//            if (caregivers != null && !caregivers.isEmpty()) {
+//                for (Caregiver caregiver : caregivers) {
+//                    List<Contact> contacts = caregiver.getContacts();
+//                    if (contacts != null && !contacts.isEmpty()) {
+//                        for (Contact contact : contacts) {
+//                            if (contact.getType() != null && contact.getContact() != null) {
+//                                return true;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
         return false;
     }
 
@@ -110,10 +116,14 @@ public class MainActivity extends AppCompatActivity {
             this.user.setPerson(this.gson.fromJson(elderlyJson, Elderly.class));
             String userJson = this.gson.toJson(this.user);
             UserService.startUserService(userJson, CrudAction.UPDATE, this);
-            //Just to see if everything is okay
-            TextView textView = super.findViewById(R.id.hello_world_text_view);
-            textView.setText(elderlyJson);
+            this.setTextViewTo(elderlyJson);
         }
+    }
+
+    //fixme Just to see if everything is okay
+    private void setTextViewTo(String elderlyJson) {
+        TextView textView = super.findViewById(R.id.hello_world_text_view);
+        textView.setText(elderlyJson);
     }
 
     public static void startMainActivitySendUser(String userJson,

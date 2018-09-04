@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.google.android.gms.common.util.CollectionUtils;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -58,8 +59,11 @@ public class NewElderlyActivity extends AppCompatActivity {
             }
         });
 
-        List<Caregiver> caregiverList = new ArrayList<>();
-        this.elderly.setCaregivers(caregiverList);
+        List<Caregiver> caregiverList = this.elderly.getCaregivers();
+        if (CollectionUtils.isEmpty(caregiverList)) {
+            caregiverList = new ArrayList<>();
+            this.elderly.setCaregivers(caregiverList);
+        }
         this.caregiverListView = super.findViewById(R.id.caregiver_list_view);
         this.caregiverListView.setAdapter(new CaregiverAdapter(caregiverList, this));
     }

@@ -10,7 +10,7 @@ public class Elderly extends Person {
     public static final String ELDERLY_JSON = "elderlyJson";
 
     public Elderly() {
-        super("elderly");
+        super(Elderly.class.getSimpleName());
     }
 
 //  private LocalDate birthday;
