@@ -10,6 +10,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -26,7 +27,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
 
     private static final int ACCELEROMETER_SAMPLING_PERIOD = 1000000;
-    public static final double CSV_THRESHOLD = 0;//23;
+    public static final double CSV_THRESHOLD = 23;
     public static final double CAV_THRESHOLD = 0;//18;
     public static final double CCA_THRESHOLD = 0;//65.5;
 
@@ -74,10 +75,14 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         double y = event.values[1];
         double z = event.values[2];
 
-        this.isFallDetected(x, y, z);
+        if (this.isFallDetected(x, y, z)) {
+            Toast.makeText(this, "Queda", Toast.LENGTH_LONG).show();
+            this.startFallNotificationService();
+        }
     }
 
-    private void isFallDetected(double x,
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    protected boolean isFallDetected(double x,
                                 double y,
                                 double z) {
 
@@ -89,14 +94,17 @@ public class FallDetectionService extends IntentService implements SensorEventLi
             if (angleVariation > CAV_THRESHOLD) {
                 double changeInAngle = this.calculateChangeInAngle();
                 if (changeInAngle > CCA_THRESHOLD) {
-                    Toast.makeText(this, "Queda", Toast.LENGTH_LONG).show();
-
-                    Intent fallNotificationServiceIntent = new Intent(this, FallNotificationService.class);
-                    fallNotificationServiceIntent.putExtra(Elderly.ELDERLY_JSON, this.gson.toJson(this.elderly));
-                    this.getBaseContext().startService(fallNotificationServiceIntent);
+                   return true;
                 }
             }
         }
+        return false;
+    }
+
+    private void startFallNotificationService() {
+        Intent fallNotificationServiceIntent = new Intent(this, FallNotificationService.class);
+        fallNotificationServiceIntent.putExtra(Elderly.ELDERLY_JSON, this.gson.toJson(this.elderly));
+        this.getBaseContext().startService(fallNotificationServiceIntent);
     }
 
     private void addAccelerometerValuesToList(double x,
@@ -114,6 +122,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.accelerometerValues.add(map);
     }
 
+    // fixme not working with data from the MobiFall_Dataset_v1.0. Probably something to do with gravity
     private double calculateAcceleration(double x,
                                          double y,
                                          double z) {
