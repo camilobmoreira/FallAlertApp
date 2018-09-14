@@ -81,8 +81,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         }
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    protected boolean isFallDetected(double x,
+    private boolean isFallDetected(double x,
                                 double y,
                                 double z) {
 
@@ -211,5 +210,19 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         Intent fallDetectionServiceIntent = new Intent(context, FallDetectionService.class);
         fallDetectionServiceIntent.putExtra(Elderly.ELDERLY_JSON, elderlyJson);
         context.startService(fallDetectionServiceIntent);
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    protected boolean testFallDetection(List<Map<AccelerometerAxis, Double>> values) {
+        for (Map<AccelerometerAxis, Double> value : values) {
+            if (this.isFallDetected(
+                    value.get(AccelerometerAxis.X),
+                    value.get(AccelerometerAxis.Y),
+                    value.get(AccelerometerAxis.Z))) {
+
+                return true;
+            }
+        }
+        return false;
     }
 }
