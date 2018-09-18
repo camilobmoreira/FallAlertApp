@@ -28,8 +28,8 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
     private static final int ACCELEROMETER_SAMPLING_PERIOD = 1000000;
     public static final double CSV_THRESHOLD = 23;
-    public static final double CAV_THRESHOLD = 0;//18;
-    public static final double CCA_THRESHOLD = 0;//65.5;
+    public static final double CAV_THRESHOLD = 18;
+    public static final double CCA_THRESHOLD = 65.5;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -134,12 +134,12 @@ public class FallDetectionService extends IntentService implements SensorEventLi
             return -1;
         }
 
-//        double anX = this.accelerometerValues.get(3).get(AccelerometerAxis.X) * this.accelerometerValues.get(4).get(AccelerometerAxis.X);
-//        double anY = this.accelerometerValues.get(3).get(AccelerometerAxis.Y) * this.accelerometerValues.get(4).get(AccelerometerAxis.Y);
-//        double anZ = this.accelerometerValues.get(3).get(AccelerometerAxis.Z) * this.accelerometerValues.get(4).get(AccelerometerAxis.Z);
-//        double an = anX + anY + anZ;
+        double anX = this.accelerometerValues.get(size -2).get(AccelerometerAxis.X) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.X);
+        double anY = this.accelerometerValues.get(size -2).get(AccelerometerAxis.Y) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.Y);
+        double anZ = this.accelerometerValues.get(size -2).get(AccelerometerAxis.Z) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.Z);
+        double an = anX + anY + anZ;
 
-        double an = this.accelerometerValues.get(size -2).get(AccelerometerAxis.ACCELERATION) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.ACCELERATION);
+//        double an = this.accelerometerValues.get(size -2).get(AccelerometerAxis.ACCELERATION) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.ACCELERATION);
 
         double anX0 = Math.pow(this.accelerometerValues.get(size -2).get(AccelerometerAxis.X), 2);
         double anY0 = Math.pow(this.accelerometerValues.get(size -2).get(AccelerometerAxis.Y), 2);
@@ -153,7 +153,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
         double a = an / (an0 * an1);
 
-        return (Math.pow(Math.cos(a), -1)) * (180 / Math.PI);
+        return (Math.pow(Math.cos(a), -1)) * (180 / Math.PI); //cosseno inverso? Ou cosseno ^-1?
     }
 
     private double calculateChangeInAngle() {
