@@ -3,11 +3,11 @@ package br.com.aimcol.fallalertapp.service;
 public class FallDetectionServiceTestCasePat2 {
     private FallDetectionServiceTest fallDetectionServiceTest;
 
-    public FallDetectionServiceTestCasePat1(FallDetectionServiceTest fallDetectionServiceTest) {
+    public FallDetectionServiceTestCasePat2(FallDetectionServiceTest fallDetectionServiceTest) {
         this.fallDetectionServiceTest = fallDetectionServiceTest;
     }
 
-    public testPat1FallBSC_acc_2_1() {
+    public void testPat1FallBSC_acc_2_1() {
         this.fallDetectionServiceTest.addToList(5.104438, 8.848969, 0.05746084);
         this.fallDetectionServiceTest.addToList(6.751649, 7.2592196, -1.7908629);
         this.fallDetectionServiceTest.addToList(5.4204726, 8.101978, -1.283292);
@@ -815,7 +815,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(-2.719813, 0.90021986, 9.356541);
     }
 
-    public testPat1FallBSC_acc_2_2() {
+    public void testPat1FallBSC_acc_2_2() {
         this.fallDetectionServiceTest.addToList(2.2984335, 9.576807, -1.1587936);
         this.fallDetectionServiceTest.addToList(2.2601264, 9.672575, -0.89064306);
         this.fallDetectionServiceTest.addToList(2.183512, 9.758766, -0.8523358);
@@ -1705,7 +1705,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(-2.825158, 0.61291564, 9.174581);
     }
 
-    public testPat1FallBSC_acc_2_3() {
+    public void testPat1FallBSC_acc_2_3() {
         this.fallDetectionServiceTest.addToList(4.8362875, 8.695741, -1.2449849);
         this.fallDetectionServiceTest.addToList(4.2042184, 8.887277, -1.2258313);
         this.fallDetectionServiceTest.addToList(4.6160207, 8.6574335, -0.9864111);
@@ -2558,7 +2558,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(-4.0701427, 0.92895025, 8.686164);
     }
 
-    public testPat1ADLCSI_acc_2_1() {
+    public void testPat1ADLCSI_acc_2_1() {
         this.fallDetectionServiceTest.addToList(0.63206923, 10.745177, -2.7868507);
         this.fallDetectionServiceTest.addToList(0.60333884, 11.81778, -2.8060043);
         this.fallDetectionServiceTest.addToList(1.13964, 11.070788, -2.3942018);
@@ -3100,7 +3100,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(6.081272, -0.9576807, 7.422025);
     }
 
-    public testPat1ADLCSI_acc_2_2() {
+    public void testPat1ADLCSI_acc_2_2() {
         this.fallDetectionServiceTest.addToList(0.63206923, 10.745177, -2.7868507);
         this.fallDetectionServiceTest.addToList(0.60333884, 11.81778, -2.8060043);
         this.fallDetectionServiceTest.addToList(1.13964, 11.070788, -2.3942018);
@@ -3642,7 +3642,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(6.081272, -0.9576807, 7.422025);
     }
 
-    public testPat1ADLCSI_acc_2_3() {
+    public void testPat1ADLCSI_acc_2_3() {
         this.fallDetectionServiceTest.addToList(0.63206923, 10.745177, -2.7868507);
         this.fallDetectionServiceTest.addToList(0.60333884, 11.81778, -2.8060043);
         this.fallDetectionServiceTest.addToList(1.13964, 11.070788, -2.3942018);
@@ -4184,7 +4184,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(6.081272, -0.9576807, 7.422025);
     }
 
-    public testPat1ADLCSI_acc_2_4() {
+    public void testPat1ADLCSI_acc_2_4() {
         this.fallDetectionServiceTest.addToList(0.63206923, 10.745177, -2.7868507);
         this.fallDetectionServiceTest.addToList(0.60333884, 11.81778, -2.8060043);
         this.fallDetectionServiceTest.addToList(1.13964, 11.070788, -2.3942018);
@@ -4726,7 +4726,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(6.081272, -0.9576807, 7.422025);
     }
 
-    public testPat1ADLCSI_acc_2_5() {
+    public void testPat1ADLCSI_acc_2_5() {
         this.fallDetectionServiceTest.addToList(2.9975405, 1.1109096, -0.16280572);
         this.fallDetectionServiceTest.addToList(-2.5474305, 9.3182335, -0.9959879);
         this.fallDetectionServiceTest.addToList(-1.7238252, 9.385271, -0.15322891);
@@ -5159,7 +5159,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(-0.78529817, -1.934515, 9.308656);
     }
 
-    public testPat1ADLCSI_acc_2_6() {
+    public void testPat1ADLCSI_acc_2_6() {
         this.fallDetectionServiceTest.addToList(-0.63206923, 9.835381, -0.842759);
         this.fallDetectionServiceTest.addToList(-0.6991069, 9.892841, -0.8714894);
         this.fallDetectionServiceTest.addToList(-0.59376204, 9.921572, -1.1300632);
@@ -5590,7 +5590,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(-2.1643584, -1.5035586, 9.260772);
     }
 
-    public testPat1ADLCSO_acc_2_1() {
+    public void testPat1ADLCSO_acc_2_1() {
         this.fallDetectionServiceTest.addToList(1.2641385, -1.7525556, 9.490616);
         this.fallDetectionServiceTest.addToList(1.6950948, -1.733402, 8.992621);
         this.fallDetectionServiceTest.addToList(1.6950948, -1.9153614, 9.11712);
@@ -6034,7 +6034,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(0.9959879, 9.80665, -0.59376204);
     }
 
-    public testPat1ADLCSO_acc_2_2() {
+    public void testPat1ADLCSO_acc_2_2() {
         this.fallDetectionServiceTest.addToList(0.08619126, -2.7964275, 9.184157);
         this.fallDetectionServiceTest.addToList(0.10534488, -2.777274, 9.107543);
         this.fallDetectionServiceTest.addToList(0.10534488, -2.72939, 9.088389);
@@ -6557,7 +6557,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(0.6895301, 9.787497, -1.4556746);
     }
 
-    public testPat1ADLCSO_acc_2_3() {
+    public void testPat1ADLCSO_acc_2_3() {
         this.fallDetectionServiceTest.addToList(2.815581, -2.2601264, 8.791509);
         this.fallDetectionServiceTest.addToList(2.767697, -2.3080103, 8.8777);
         this.fallDetectionServiceTest.addToList(2.5091233, -2.3080103, 9.222465);
@@ -7015,7 +7015,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(-0.25857377, 9.921572, -0.22026655);
     }
 
-    public testPat1ADLCSO_acc_2_4() {
+    public void testPat1ADLCSO_acc_2_4() {
         this.fallDetectionServiceTest.addToList(-2.0015526, -2.2026656, 9.56723);
         this.fallDetectionServiceTest.addToList(-2.6144683, -2.9400797, 9.490616);
         this.fallDetectionServiceTest.addToList(-1.2545617, 0.33518824, 9.605537);
@@ -7412,7 +7412,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(0.17238252, 9.816227, -1.0821792);
     }
 
-    public testPat1ADLCSO_acc_2_5() {
+    public void testPat1ADLCSO_acc_2_5() {
         this.fallDetectionServiceTest.addToList(2.920926, -1.532289, 9.14585);
         this.fallDetectionServiceTest.addToList(0.545878, -1.7525556, 8.90643);
         this.fallDetectionServiceTest.addToList(1.0055647, -2.0494366, 9.557653);
@@ -7832,7 +7832,7 @@ public class FallDetectionServiceTestCasePat2 {
         this.fallDetectionServiceTest.addToList(1.5610195, 9.825804, -0.23942018);
     }
 
-    public testPat1ADLCSO_acc_2_6() {
+    public void testPat1ADLCSO_acc_2_6() {
         this.fallDetectionServiceTest.addToList(-0.8714894, -1.4652514, 9.471462);
         this.fallDetectionServiceTest.addToList(-0.7661445, -2.0111294, 9.241618);
         this.fallDetectionServiceTest.addToList(-0.79487497, -1.9057846, 9.260772);
