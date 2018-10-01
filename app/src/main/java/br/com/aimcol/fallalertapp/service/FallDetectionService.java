@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -76,7 +77,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         double z = event.values[2];
 
         if (this.isFallDetected(x, y, z)) {
-            Toast.makeText(this, "Queda", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Fall", Toast.LENGTH_LONG).show();
             this.startFallNotificationService();
         }
     }
@@ -88,11 +89,14 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         double acceleration = this.calculateAcceleration(x, y, z);// - SensorManager.GRAVITY_EARTH;
         this.addAccelerometerValuesToList(x, y, z, acceleration);
 
+        Log.d("FDS-Acc-Values", "x: " + x + " y: " + y + " z: " + z + " acc: " + acceleration);
+
         if (acceleration > CSV_THRESHOLD) {
             double angleVariation = this.calculateAngleVariation();
             if (angleVariation > CAV_THRESHOLD) {
                 double changeInAngle = this.calculateChangeInAngle();
                 if (changeInAngle > CCA_THRESHOLD) {
+                    Log.d("FDS-Fall-Happened", "Fall Happened");
                    return true;
                 }
             }
