@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,20 +23,23 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.aimcol.fallalertapp.model.Elderly;
+import br.com.aimcol.fallalertapp.model.Person;
+import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.util.AccelerometerAxis;
+import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class FallDetectionService extends IntentService implements SensorEventListener {
 
 
     private static final int ACCELEROMETER_SAMPLING_PERIOD = 1000000;
-    public static final double CSV_THRESHOLD = 23;
-    public static final double CAV_THRESHOLD = 18;
-    public static final double CCA_THRESHOLD = 65.5;
+    private static final double CSV_THRESHOLD = 23;
+    private static final double CAV_THRESHOLD = 18;
+    private static final double CCA_THRESHOLD = 65.5;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private Elderly elderly;
-    private Gson gson = new Gson();
+    private User user;
+    private Gson gson;
 
     private List<Map<AccelerometerAxis, Double>> accelerometerValues = new ArrayList<>();
 
@@ -106,7 +110,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
     private void startFallNotificationService() {
         Intent fallNotificationServiceIntent = new Intent(this, FallNotificationService.class);
-        fallNotificationServiceIntent.putExtra(Elderly.ELDERLY_JSON, this.gson.toJson(this.elderly));
+        fallNotificationServiceIntent.putExtra(User.USER_JSON, this.gson.toJson(this.user));
         this.getBaseContext().startService(fallNotificationServiceIntent);
     }
 
@@ -178,9 +182,9 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (this.elderly == null) {
-            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
-            this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
+        if (this.user == null) {
+            String userJson = intent.getStringExtra(User.USER_JSON);
+            this.user = this.gson.fromJson(userJson, User.class);
         }
     }
 
@@ -189,9 +193,16 @@ public class FallDetectionService extends IntentService implements SensorEventLi
                               int flags,
                               int startId) {
 
-        if (this.elderly == null) {
-            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
-            this.elderly = this.gson.fromJson(elderlyJson, Elderly.class);
+        if (this.gson == null) {
+            RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                    .of(Person.class, "type")
+                    .registerSubtype(Elderly.class, Elderly.class.getSimpleName());
+            this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
+        }
+
+        if (this.user == null) {
+            String userJson = intent.getStringExtra(User.USER_JSON);
+            this.user = this.gson.fromJson(userJson, User.class);
         }
 
         this.mSensorManager = (SensorManager) super.getSystemService(Context.SENSOR_SERVICE);
@@ -208,11 +219,11 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         return Service.START_STICKY;
     }
 
-    public static void startFallDetectionService(String elderlyJson,
+    public static void startFallDetectionService(String userJson,
                                                  Context context) {
 
         Intent fallDetectionServiceIntent = new Intent(context, FallDetectionService.class);
-        fallDetectionServiceIntent.putExtra(Elderly.ELDERLY_JSON, elderlyJson);
+        fallDetectionServiceIntent.putExtra(User.USER_JSON, userJson);
         context.startService(fallDetectionServiceIntent);
     }
 

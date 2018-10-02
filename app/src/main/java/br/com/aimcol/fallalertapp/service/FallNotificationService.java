@@ -12,14 +12,22 @@ import android.support.annotation.Nullable;
 import android.telephony.SmsManager;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import br.com.aimcol.fallalertapp.dto.ElderlyDTO;
 import br.com.aimcol.fallalertapp.model.Caregiver;
 import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.Elderly;
+import br.com.aimcol.fallalertapp.model.Fall;
+import br.com.aimcol.fallalertapp.model.FallHistory;
+import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.util.PermissionUtils;
 
 public class FallNotificationService extends IntentService {
@@ -28,6 +36,7 @@ public class FallNotificationService extends IntentService {
     public static final String SMS_DELIVERED = "SMS_DELIVERED";
     public static final String SMS_SENT = "SMS_SENT";
 
+    private DatabaseReference mDatabase;
     private Long lastSentInMillis;
     private Long minTimeToNotifyAgain;
     private Gson gson = new Gson();
@@ -60,13 +69,35 @@ public class FallNotificationService extends IntentService {
                               int startId) {
 
         this.minTimeToNotifyAgain = 3000000L;
+        if (this.mDatabase == null) {
+            this.mDatabase = FirebaseDatabase.getInstance().getReference();
+        }
 
         if (intent != null) {
-            String elderlyJson = intent.getStringExtra(Elderly.ELDERLY_JSON);
-            Elderly elderly = this.gson.fromJson(elderlyJson, Elderly.class);
-            this.sendNotification(elderly);
+            String userJson = intent.getStringExtra(User.USER_JSON);
+            User user = this.gson.fromJson(userJson, User.class);
+            this.sendNotification((Elderly) user.getPerson());
+            this.registerNewFall(user);
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void registerNewFall(User user) {
+        FallHistory fallHistory = null;//getElderlyFallHistory(elderly);
+        Elderly elderly = (Elderly) user.getPerson();
+        if (fallHistory == null) {
+            fallHistory = new FallHistory();
+            fallHistory.setElderlyDTO(new ElderlyDTO(user.getKey(), elderly.getName()));
+        }
+        List<Fall> falls = fallHistory.getFalls();
+        if (falls == null) {
+            falls = new ArrayList<>();
+        }
+        Fall fall = new Fall();
+        fall.setDate(new Date());
+        falls.add(fall);
+
+        this.mDatabase.child("fall_history");
     }
 
     private void sendNotification(Elderly elderly) {

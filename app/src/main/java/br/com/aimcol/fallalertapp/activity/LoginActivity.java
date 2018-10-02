@@ -7,7 +7,6 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
@@ -35,6 +34,7 @@ import com.google.gson.Gson;
 import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.service.UserService;
+import br.com.aimcol.fallalertapp.util.BroadcastReceiverUtils;
 import br.com.aimcol.fallalertapp.util.CrudAction;
 
 /**
@@ -71,11 +71,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onReceive(Context context, Intent intent) {
                     //fixme change to a better location
                     String updateUserJson = intent.getStringExtra(User.USER_JSON);
-                    UserService.startUserService(updateUserJson, CrudAction.UPDATE, LoginActivity.this);
+                    //UserService.startUserService(updateUserJson, CrudAction.UPDATE, LoginActivity.this);
+                    LoginActivity.super.unregisterReceiver(LoginActivity.this.mBroadcastReceiver);
                     MainActivity.startMainActivitySendUser(updateUserJson, LoginActivity.this);
                 }
             };
-            this.registerBroadcastReceiver(UserService.USER_SERVICE_ACTION_LOAD);
+            BroadcastReceiverUtils.registerBroadcastReceiver(LoginActivity.this, LoginActivity.this.mBroadcastReceiver, UserService.USER_SERVICE_ACTION_LOAD);
             UserService.startUserService(userJson, CrudAction.READ, this);
             this.showProgress(true);
         }
@@ -135,18 +136,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         this.mProgressView = super.findViewById(R.id.login_progress);
     }
 
-    private void registerBroadcastReceiver(String action) {
-        try {
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(action);
-            this.registerReceiver(this.mBroadcastReceiver, intentFilter);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -180,12 +169,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             public void onReceive(Context context, Intent intent) {
                                 //fixme change to a better location
                                 String updateUserJson = intent.getStringExtra(User.USER_JSON);
-                                UserService.startUserService(updateUserJson, CrudAction.UPDATE, LoginActivity.this);
+                                //UserService.startUserService(updateUserJson, CrudAction.UPDATE, LoginActivity.this);
+                                LoginActivity.super.unregisterReceiver(LoginActivity.this.mBroadcastReceiver);
                                 MainActivity.startMainActivitySendUser(updateUserJson, LoginActivity.this);
                             }
                         };
 
-                        LoginActivity.this.registerBroadcastReceiver(UserService.USER_SERVICE_ACTION_LOAD);
+                        BroadcastReceiverUtils.registerBroadcastReceiver(LoginActivity.this, LoginActivity.this.mBroadcastReceiver, UserService.USER_SERVICE_ACTION_LOAD);
                         UserService.startUserService(userJson, CrudAction.READ, LoginActivity.this);
 
                     } else {
@@ -217,9 +207,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         FirebaseUser currentUser = LoginActivity.this.mAuth.getCurrentUser();
                         User user = UserService.toUser(currentUser);
                         String userJson = LoginActivity.this.gson.toJson(user);
+                        LoginActivity.this.mBroadcastReceiver = new BroadcastReceiver() {
+                            @Override
+                            public void onReceive(Context context, Intent intent) {
+                                //fixme change to a better location
+                                String updateUserJson = intent.getStringExtra(User.USER_JSON);
+                                LoginActivity.super.unregisterReceiver(LoginActivity.this.mBroadcastReceiver);
+                                MainActivity.startMainActivitySendUser(updateUserJson, LoginActivity.this);
+                                LoginActivity.this.showProgress(true);
+                            }
+                        };
+
+                        BroadcastReceiverUtils.registerBroadcastReceiver(LoginActivity.this, LoginActivity.this.mBroadcastReceiver, UserService.USER_SERVICE_ACTION_UPDATE);
                         UserService.startUserService(userJson, CrudAction.CREATE, LoginActivity.this);
-                        MainActivity.startMainActivitySendUser(userJson, LoginActivity.this);
-                        LoginActivity.this.showProgress(true);
 
                     } else {
                         // If sign up fails, display a message to the user.

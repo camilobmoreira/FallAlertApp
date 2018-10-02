@@ -2,6 +2,7 @@ package br.com.aimcol.fallalertapp.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.service.FallDetectionService;
 import br.com.aimcol.fallalertapp.service.UserService;
+import br.com.aimcol.fallalertapp.util.BroadcastReceiverUtils;
 import br.com.aimcol.fallalertapp.util.CrudAction;
 import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_SMS = 0;
 
+    private BroadcastReceiver mBroadcastReceiver;
     private User user;
     private Gson gson;
 
@@ -47,28 +50,42 @@ public class MainActivity extends AppCompatActivity {
         this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
 
         Intent intent = super.getIntent();
+        String userJson = null;
         if (this.user == null) {
-            String userJson = intent.getStringExtra(User.USER_JSON);
+            userJson = intent.getStringExtra(User.USER_JSON);
             this.user = this.gson.fromJson(userJson, User.class);
         }
         if (this.user.getPerson() == null) {
             this.user.setPerson(new Elderly());
         }
         Elderly elderly = (Elderly) this.user.getPerson();
-        String elderlyJson = this.gson.toJson(elderly);
+        if (userJson == null) {
+            userJson = this.gson.toJson(this.user);
+        }
 
         // Initiate FallDetectionService
         if (this.isReadyToStartFallDetectionService()) {
-            FallDetectionService.startFallDetectionService(elderlyJson, this);
+            FallDetectionService.startFallDetectionService(userJson, this);
             this.setTextViewTo("Fall Detection Service Running");
         } else {
             //fixme remove from else and set the TextViews text to Elderly properties for editing an existing Elderly
+            String elderlyJson = this.gson.toJson(elderly);
             this.startNewElderlyActivity(elderlyJson, this);
         }
     }
 
     private void startNewElderlyActivity(String elderlyJson,
                                          Context context) {
+
+        this.mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //fixme change to a better location
+                String updateUserJson = intent.getStringExtra(User.USER_JSON);
+                MainActivity.this.user = MainActivity.this.gson.fromJson(updateUserJson, User.class);
+                MainActivity.super.unregisterReceiver(MainActivity.this.mBroadcastReceiver);
+            }
+        };
 
         Intent newElderlyActivityIntent = new Intent(context, NewElderlyActivity.class);
         newElderlyActivityIntent.putExtra(Elderly.ELDERLY_JSON, elderlyJson);
@@ -115,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
             String elderlyJson = data.getStringExtra(Elderly.ELDERLY_JSON);
             this.user.setPerson(this.gson.fromJson(elderlyJson, Elderly.class));
             String userJson = this.gson.toJson(this.user);
+            BroadcastReceiverUtils.registerBroadcastReceiver(this, this.mBroadcastReceiver, UserService.USER_SERVICE_ACTION_UPDATE);
             UserService.startUserService(userJson, CrudAction.UPDATE, this);
             this.setTextViewTo(elderlyJson);
         }

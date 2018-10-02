@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +27,7 @@ import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class UserService extends IntentService {
 
+    public static final String USER_SERVICE_ACTION_UPDATE = "UserService#update";
     public static final String USER_SERVICE_ACTION_LOAD = "UserService#load";
     private DatabaseReference mDatabase;
     private Gson gson;
@@ -66,13 +68,13 @@ public class UserService extends IntentService {
         CrudAction action = (CrudAction) intent.getSerializableExtra("crudAction");
         switch (action) {
             case CREATE:
-                user = this.save(user);
+                this.save(user);
                 break;
             case READ:
                 this.load(user.getEmail());
                 break;
             case UPDATE:
-                user = this.update(user);
+                this.update(user);
                 break;
             case DELETE:
                 this.delete(user);
@@ -82,11 +84,10 @@ public class UserService extends IntentService {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private User save(User user) {
+    private void save(User user) {
         String key = this.mDatabase.child("user").push().getKey();
         user.setKey(key);
-
-        return this.update(user);
+        this.update(user);
     }
 
     private void load(String email) {
@@ -111,29 +112,41 @@ public class UserService extends IntentService {
         });
     }
 
-    private User update(User user) {
+    private void update(User user) {
         Task<Void> task = this.mDatabase.child("user").child(user.getKey()).setValue(user);
 
-        // fixme add some event listener that has onComplete method because this is always returning false
-        if (task.isSuccessful()) {
-            Toast.makeText(this, "Success", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show();
-//            Log.e("update", task.getException().getMessage());
-        }
+        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(UserService.this, "Success", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(UserService.this, "Failed", Toast.LENGTH_LONG).show();
+                    Log.e("update", task.getException().getMessage());
+                }
+            }
+        });
 
-        return user;
+        Intent loadResponseIntent =  new Intent();
+        loadResponseIntent.setAction(USER_SERVICE_ACTION_UPDATE);
+        loadResponseIntent.putExtra(User.USER_JSON, this.gson.toJson(user));
+        UserService.this.sendBroadcast(loadResponseIntent);
     }
 
     private void delete(User user) {
         Task<Void> task = this.mDatabase.child("user").child(user.getKey()).removeValue();
 
-        if (task.isSuccessful()) {
-            Toast.makeText(this, "Success", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Failed", Toast.LENGTH_LONG).show();
-            Log.e("update", task.getException().getMessage());
-        }
+        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(UserService.this, "Success", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(UserService.this, "Failed", Toast.LENGTH_LONG).show();
+                    Log.e("delete", task.getException().getMessage());
+                }
+            }
+        });
     }
 
     public static User toUser(FirebaseUser currentUser) {
