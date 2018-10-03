@@ -87,7 +87,7 @@ public class FallNotificationService extends IntentService {
         Elderly elderly = (Elderly) user.getPerson();
         if (fallHistory == null) {
             fallHistory = new FallHistory();
-            fallHistory.setElderlyDTO(new ElderlyDTO(user.getKey(), elderly.getName()));
+            fallHistory.setElderly(new ElderlyDTO(user.getKey(), elderly.getName()));
         }
         List<Fall> falls = fallHistory.getFalls();
         if (falls == null) {

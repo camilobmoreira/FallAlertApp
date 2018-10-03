@@ -40,6 +40,7 @@
         <service
             android:name=".service.FallNotificationService"
             android:exported="false" />
+        <service android:name=".service.FallHistoryService" />
 
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.NewCaregiverActivity" />

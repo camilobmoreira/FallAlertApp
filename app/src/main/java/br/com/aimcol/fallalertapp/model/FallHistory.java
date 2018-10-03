@@ -7,7 +7,9 @@ import lombok.Data;
 
 @Data
 public class FallHistory {
+    public static final String FALL_HISTORY_JSON = "fallHistoryJson";
 
-    private ElderlyDTO elderlyDTO;
+    private String key;
+    private ElderlyDTO elderly;
     private List<Fall> falls;
 }
