@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,8 +28,10 @@ import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Fall;
 import br.com.aimcol.fallalertapp.model.FallHistory;
+import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.util.PermissionUtils;
+import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class FallNotificationService extends IntentService {
 
@@ -39,7 +42,7 @@ public class FallNotificationService extends IntentService {
     private DatabaseReference mDatabase;
     private Long lastSentInMillis;
     private Long minTimeToNotifyAgain;
-    private Gson gson = new Gson();
+    private Gson gson;
     private BroadcastReceiver sentStatusReceiver;
     private BroadcastReceiver deliveredStatusReceiver;
 //    private AlertDialog mAlertDialog;
@@ -67,6 +70,10 @@ public class FallNotificationService extends IntentService {
     public int onStartCommand(@Nullable Intent intent,
                               int flags,
                               int startId) {
+        RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(Person.class, "type")
+                .registerSubtype(Elderly.class, Elderly.class.getSimpleName());
+        this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
 
         this.minTimeToNotifyAgain = 3000000L;
         if (this.mDatabase == null) {
@@ -77,46 +84,29 @@ public class FallNotificationService extends IntentService {
             String userJson = intent.getStringExtra(User.USER_JSON);
             User user = this.gson.fromJson(userJson, User.class);
             this.sendNotification((Elderly) user.getPerson());
-            this.registerNewFall(user);
+            FallHistoryService.startFallHistoryService(userJson, FallHistoryService.FALL_HISTORY_ACTION_REGISTER_NEW_FALL, this);
         }
         return super.onStartCommand(intent, flags, startId);
-    }
-
-    private void registerNewFall(User user) {
-        FallHistory fallHistory = null;//getElderlyFallHistory(elderly);
-        Elderly elderly = (Elderly) user.getPerson();
-        if (fallHistory == null) {
-            fallHistory = new FallHistory();
-            fallHistory.setElderly(new ElderlyDTO(user.getKey(), elderly.getName()));
-        }
-        List<Fall> falls = fallHistory.getFalls();
-        if (falls == null) {
-            falls = new ArrayList<>();
-        }
-        Fall fall = new Fall();
-        fall.setDate(new Date());
-        falls.add(fall);
-
-        this.mDatabase.child("fall_history");
     }
 
     private void sendNotification(Elderly elderly) {
         if (this.isItOkayToNotifyAgain()) {
             for (Caregiver caregiver : elderly.getCaregivers()) {
                 for (Contact contact : caregiver.getContacts()) {
-                    switch (contact.getType()) {
-                        case SMS:
-                            this.sendSms(contact.getContact(), "Someone fell down");
-                            break;
+//                    switch (contact.getType()) {
+//                        case SMS:
+//                            this.sendSms(contact.getContact(), "Someone fell down");
+//                            break;
 //                    case EMAIL:
 //                        success = this.sendEmail(name, contact);
 //                        break;
 //                    case WHATSAPP:
 //                        success = this.sendWhatsapp(name, contact);
 //                        break;
-                    }
+//                    }
                 }
             }
+            FallNotificationService.this.lastSentInMillis = Calendar.getInstance().getTimeInMillis();
         } else {
             Toast.makeText(this.getApplicationContext(), "Not long enough since last notification", Toast.LENGTH_SHORT).show();
         }
@@ -139,7 +129,6 @@ public class FallNotificationService extends IntentService {
 //                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
 //                    sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
                 }
-                FallNotificationService.this.lastSentInMillis = Calendar.getInstance().getTimeInMillis();
 //                FallNotificationService.this.registerBroadcastReceiverForSms();
             }
         } else {

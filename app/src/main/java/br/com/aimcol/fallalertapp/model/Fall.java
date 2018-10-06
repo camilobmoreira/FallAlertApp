@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class Fall {
-    private Long latitude;
-    private Long longitude;
-    private Date date;
+    private Double latitude;
+    private Double longitude;
+//    private Date date;
 }
