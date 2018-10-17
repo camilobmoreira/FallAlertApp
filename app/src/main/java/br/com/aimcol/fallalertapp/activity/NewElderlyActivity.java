@@ -32,7 +32,6 @@ public class NewElderlyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_new_elderly);
 
-        // Initiate variables
         this.gson = new Gson();
         Intent intent = super.getIntent();
         if (this.elderly == null) {

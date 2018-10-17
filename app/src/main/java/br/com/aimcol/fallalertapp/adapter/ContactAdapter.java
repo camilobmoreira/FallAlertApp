@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,19 +60,16 @@ public class ContactAdapter extends BaseAdapter implements ListAdapter {
             view = inflater.inflate(R.layout.layout_contact, null);
         }
 
-        Spinner contactTypeSpinner = (Spinner) view.findViewById(R.id.contact_type_spinner);
-        List<ContactType> contactTypes = new ArrayList<>();
-        for (ContactType ct: ContactType.values()) {
-            contactTypes.add(ct);
-        }
+        Spinner contactTypeSpinner = view.findViewById(R.id.contact_type_spinner);
+        List<ContactType> contactTypes = new ArrayList<>(Arrays.asList(ContactType.values()));
         ArrayAdapter dataAdapter = new ArrayAdapter(this.context, R.layout.support_simple_spinner_dropdown_item, contactTypes);
         dataAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         contactTypeSpinner.setAdapter(dataAdapter);
 
-        Contact contact = list.get(position);
+        Contact contact = this.list.get(position);
         contact.setType((ContactType) contactTypeSpinner.getSelectedItem());
 
-        EditText contactEditText = (EditText) view.findViewById(R.id.contact_edit_text);
+        EditText contactEditText = view.findViewById(R.id.contact_edit_text);
         contactEditText.setText(contact.getContact());
         // fixme workaround
         contactEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -86,13 +84,13 @@ public class ContactAdapter extends BaseAdapter implements ListAdapter {
             }
         });
 
-        Button deleteBtn = (Button)view.findViewById(R.id.delete_contact_button);
+        Button deleteBtn = view.findViewById(R.id.delete_contact_button);
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 //do something
-                list.remove(position);
-                notifyDataSetChanged();
+                ContactAdapter.this.list.remove(position);
+                ContactAdapter.super.notifyDataSetChanged();
             }
         });
 

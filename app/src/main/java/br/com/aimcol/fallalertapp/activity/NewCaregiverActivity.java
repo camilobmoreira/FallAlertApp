@@ -57,10 +57,10 @@ public class NewCaregiverActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText nameEditText = NewCaregiverActivity.super.findViewById(R.id.name_edit_text);
-                caregiver.setName(nameEditText.getText().toString());
+                NewCaregiverActivity.this.caregiver.setName(nameEditText.getText().toString());
 
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra(Caregiver.CAREGIVER_JSON, gson.toJson(caregiver));
+                resultIntent.putExtra(Caregiver.CAREGIVER_JSON, NewCaregiverActivity.this.gson.toJson(NewCaregiverActivity.this.caregiver));
                 NewCaregiverActivity.super.setResult(Activity.RESULT_OK, resultIntent);
                 NewCaregiverActivity.super.finish();
             }

@@ -4,20 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.model.Caregiver;
-import br.com.aimcol.fallalertapp.model.Contact;
-import br.com.aimcol.fallalertapp.model.ContactType;
 
 public class CaregiverAdapter extends BaseAdapter implements ListAdapter {
 
@@ -52,21 +47,20 @@ public class CaregiverAdapter extends BaseAdapter implements ListAdapter {
             view = inflater.inflate(R.layout.layout_caregiver, null);
         }
 
-        Caregiver caregiver = list.get(position);
+        Caregiver caregiver = this.list.get(position);
 
-        TextView caregiverNameEditText = (TextView) view.findViewById(R.id.caregiver_name_text_view);
+        TextView caregiverNameEditText = view.findViewById(R.id.caregiver_name_text_view);
         caregiverNameEditText.setText(caregiver.getName());
 
-        TextView contactEditText = (TextView) view.findViewById(R.id.caregiver_contacts_text_view);
+        TextView contactEditText = view.findViewById(R.id.caregiver_contacts_text_view);
         contactEditText.setText(caregiver.getContacts().toString());
 
-        Button deleteBtn = (Button)view.findViewById(R.id.delete_caregiver_button);
+        Button deleteBtn = view.findViewById(R.id.delete_caregiver_button);
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                //do something
-                list.remove(position);
-                notifyDataSetChanged();
+                CaregiverAdapter.this.list.remove(position);
+                CaregiverAdapter.super.notifyDataSetChanged();
             }
         });
 

@@ -1,7 +1,5 @@
 package br.com.aimcol.fallalertapp.model;
 
-import java.util.Date;
-
 import lombok.Data;
 
 @Data
