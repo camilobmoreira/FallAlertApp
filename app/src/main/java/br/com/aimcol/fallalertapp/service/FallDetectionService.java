@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.aimcol.fallalertapp.activity.FallNotificationActivity;
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
@@ -40,6 +41,9 @@ public class FallDetectionService extends IntentService implements SensorEventLi
     private Sensor mAccelerometer;
     private User user;
     private Gson gson;
+
+    private Long lastSentInMillis;
+    private Long minTimeToNotifyAgain = 3000000L;
 
     private List<Map<AccelerometerAxis, Double>> accelerometerValues = new ArrayList<>();
 
@@ -81,8 +85,11 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         double z = event.values[2];
 
         if (this.isFallDetected(x, y, z)) {
-            Toast.makeText(this, "Fall", Toast.LENGTH_LONG).show();
-            this.startFallNotificationService();
+            if (this.isOkayToNotifyAgain()) {
+                this.lastSentInMillis = System.currentTimeMillis();
+                Toast.makeText(this, "Fall", Toast.LENGTH_LONG).show();
+                FallNotificationActivity.startFallNotificationActivity(this, this.gson.toJson(this.user));
+            }
         }
     }
 
@@ -106,12 +113,6 @@ public class FallDetectionService extends IntentService implements SensorEventLi
             }
         }
         return false;
-    }
-
-    private void startFallNotificationService() {
-        Intent fallNotificationServiceIntent = new Intent(this, FallNotificationService.class);
-        fallNotificationServiceIntent.putExtra(User.USER_JSON, this.gson.toJson(this.user));
-        this.getBaseContext().startService(fallNotificationServiceIntent);
     }
 
     private void addAccelerometerValuesToList(double x,
@@ -206,10 +207,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         }
 
         this.mSensorManager = (SensorManager) super.getSystemService(Context.SENSOR_SERVICE);
-        //this.mAccelerometer = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
-        //if (this.mAccelerometer == null) {
         this.mAccelerometer = this.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //}
         if (this.mAccelerometer == null) {
             throw new RuntimeException("Acelerometro não encontrado");
         }
@@ -217,6 +215,10 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.mSensorManager.registerListener(this, this.mAccelerometer, ACCELEROMETER_SAMPLING_PERIOD);
 
         return Service.START_STICKY;
+    }
+
+    private boolean isOkayToNotifyAgain() {
+        return this.lastSentInMillis == null || (this.lastSentInMillis + this.minTimeToNotifyAgain) < System.currentTimeMillis();
     }
 
     public static void startFallDetectionService(String userJson,
@@ -241,3 +243,4 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         return false;
     }
 }
+

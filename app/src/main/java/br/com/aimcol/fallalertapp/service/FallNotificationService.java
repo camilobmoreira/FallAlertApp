@@ -3,7 +3,6 @@ package br.com.aimcol.fallalertapp.service;
 import android.Manifest;
 import android.app.Activity;
 import android.app.IntentService;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,17 +16,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import br.com.aimcol.fallalertapp.dto.ElderlyDTO;
 import br.com.aimcol.fallalertapp.model.Caregiver;
 import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.Elderly;
-import br.com.aimcol.fallalertapp.model.Fall;
-import br.com.aimcol.fallalertapp.model.FallHistory;
 import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.util.PermissionUtils;
@@ -41,12 +34,10 @@ public class FallNotificationService extends IntentService {
 
     private DatabaseReference mDatabase;
     private Long lastSentInMillis;
-    private Long minTimeToNotifyAgain;
+    private Long minTimeToNotifyAgain = 3000000L;
     private Gson gson;
     private BroadcastReceiver sentStatusReceiver;
     private BroadcastReceiver deliveredStatusReceiver;
-//    private AlertDialog mAlertDialog;
-//    private Handler mHandler;
 
     public FallNotificationService() {
         super(".FallNotificationService");
@@ -75,7 +66,6 @@ public class FallNotificationService extends IntentService {
                 .registerSubtype(Elderly.class, Elderly.class.getSimpleName());
         this.gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
 
-        this.minTimeToNotifyAgain = 3000000L;
         if (this.mDatabase == null) {
             this.mDatabase = FirebaseDatabase.getInstance().getReference();
         }
@@ -90,7 +80,7 @@ public class FallNotificationService extends IntentService {
     }
 
     private void sendNotification(Elderly elderly) {
-        if (this.isItOkayToNotifyAgain()) {
+        if (this.isOkayToNotifyAgain()) {
             for (Caregiver caregiver : elderly.getCaregivers()) {
                 for (Contact contact : caregiver.getContacts()) {
 //                    switch (contact.getType()) {
@@ -106,7 +96,7 @@ public class FallNotificationService extends IntentService {
 //                    }
                 }
             }
-            FallNotificationService.this.lastSentInMillis = Calendar.getInstance().getTimeInMillis();
+            FallNotificationService.this.lastSentInMillis = System.currentTimeMillis();
         } else {
             Toast.makeText(this.getApplicationContext(), "Not long enough since last notification", Toast.LENGTH_SHORT).show();
         }
@@ -136,8 +126,8 @@ public class FallNotificationService extends IntentService {
         }
     }
 
-    private boolean isItOkayToNotifyAgain() {
-        return this.lastSentInMillis == null || (this.lastSentInMillis + this.minTimeToNotifyAgain) < Calendar.getInstance().getTimeInMillis();
+    private boolean isOkayToNotifyAgain() {
+        return this.lastSentInMillis == null || (this.lastSentInMillis + this.minTimeToNotifyAgain) < System.currentTimeMillis();
     }
 
     public void registerBroadcastReceiverForSms() {
@@ -232,12 +222,10 @@ public class FallNotificationService extends IntentService {
 //        }
 //    }
 
-//    private AlertDialog showMessageOKCancel(String message,
-//                                            DialogInterface.OnClickListener okListener, DialogInterface.OnClickListener cancelListener) {
-//        return new android.support.v7.app.AlertDialog.Builder(this)
-//                .setMessage(message)
-//                .setPositiveButton("I did", okListener)
-//                .setNegativeButton("I did not", cancelListener)
-//                .create();
-//    }
+    public static void startFallNotificationService(Context context,
+                                                    String userJson) {
+        Intent fallNotificationServiceIntent = new Intent(context, FallNotificationService.class);
+        fallNotificationServiceIntent.putExtra(User.USER_JSON, userJson);
+        context.startService(fallNotificationServiceIntent);
+    }
 }

@@ -5,8 +5,8 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -25,6 +25,7 @@ import br.com.aimcol.fallalertapp.service.FallDetectionService;
 import br.com.aimcol.fallalertapp.service.UserService;
 import br.com.aimcol.fallalertapp.util.BroadcastReceiverUtils;
 import br.com.aimcol.fallalertapp.util.CrudAction;
+import br.com.aimcol.fallalertapp.util.PermissionUtils;
 import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_main);
 
         // Request permissions
-        this.requestSendSMSPermission();
+        PermissionUtils.requestPermission(this, Manifest.permission.SEND_SMS, REQUEST_SMS);
+//        PermissionUtils.requestPermissionOnSettings(this, Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
 
         // Initiate variables
         RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
@@ -93,33 +95,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isReadyToStartFallDetectionService() {
-//        Person person = this.user.getPerson();
-//        if (person != null) {
-//            Elderly elderly = (Elderly) person;
-//            List<Caregiver> caregivers = elderly.getCaregivers();
-//            if (caregivers != null && !caregivers.isEmpty()) {
-//                for (Caregiver caregiver : caregivers) {
-//                    List<Contact> contacts = caregiver.getContacts();
-//                    if (contacts != null && !contacts.isEmpty()) {
-//                        for (Contact contact : contacts) {
-//                            if (contact.getType() != null && contact.getContact() != null) {
-//                                return true;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-        return false;
-    }
-
-    private void requestSendSMSPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            int hasSMSPermission = this.checkSelfPermission(Manifest.permission.SEND_SMS);
-            if (hasSMSPermission != PackageManager.PERMISSION_GRANTED) {
-                this.requestPermissions(new String[] {Manifest.permission.SEND_SMS}, REQUEST_SMS);
+        Person person = this.user.getPerson();
+        if (person != null) {
+            Elderly elderly = (Elderly) person;
+            List<Caregiver> caregivers = elderly.getCaregivers();
+            if (caregivers != null && !caregivers.isEmpty()) {
+                for (Caregiver caregiver : caregivers) {
+                    List<Contact> contacts = caregiver.getContacts();
+                    if (contacts != null && !contacts.isEmpty()) {
+                        for (Contact contact : contacts) {
+                            if (contact.getType() != null && contact.getContact() != null) {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
         }
+        return false;
     }
 
     @Override

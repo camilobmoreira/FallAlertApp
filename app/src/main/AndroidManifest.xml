@@ -10,11 +10,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.SEND_SMS" />
-
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
@@ -45,6 +41,7 @@
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.NewCaregiverActivity" />
         <activity android:name=".activity.NewElderlyActivity" />
+        <activity android:name=".activity.FallNotificationActivity"></activity>
     </application>
 
 </manifest>
