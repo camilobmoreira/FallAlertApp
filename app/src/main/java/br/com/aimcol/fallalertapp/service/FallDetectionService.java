@@ -43,7 +43,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
     private Gson gson;
 
     private Long lastSentInMillis;
-    private Long minTimeToNotifyAgain = 3000000L;
+    private Long minTimeToNotifyAgain = 30000L;
 
     private List<Map<AccelerometerAxis, Double>> accelerometerValues = new ArrayList<>();
 
@@ -108,9 +108,16 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         Log.d("FDS-Acc-Values", msg.toString());
 
         if (acceleration > CSV_THRESHOLD) {
-            msg.append(System.currentTimeMillis());
-            Log.d("FDS-Fall-Happened", msg.toString());
-            return true;
+            double angleVariation = this.calculateAngleVariation();
+            if (angleVariation > CAV_THRESHOLD) {
+                double changeInAngle = this.calculateChangeInAngle();
+                if (changeInAngle > CCA_THRESHOLD) {
+                    msg.append(System.currentTimeMillis());
+                    Log.d("FDS-Fall-Happened", msg.toString());
+                    return true;
+                }
+            }
+
         }
         return false;
     }
@@ -161,7 +168,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
         double a = an / (an0 * an1);
 
-        return (Math.pow(Math.cos(a), -1)) * (180 / Math.PI); //cosseno inverso? Ou cosseno ^-1?
+        return Math.acos(a) * (180 / Math.PI);
     }
 
     private double calculateChangeInAngle() {
@@ -177,7 +184,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
 
         double a1 = (Math.sqrt(Math.pow(aX, 2)) + Math.sqrt(Math.pow(aY, 2)) + Math.sqrt(Math.pow(aZ, 2)));
 
-        return (Math.pow(Math.cos(a0 / a1), -1)) * (180 / Math.PI);
+        return Math.acos(a0 / a1) * (180 / Math.PI);
     }
 
     @Override

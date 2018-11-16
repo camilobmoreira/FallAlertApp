@@ -35,7 +35,7 @@ public class FallNotificationService extends IntentService {
 
     private DatabaseReference mDatabase;
     private Long lastSentInMillis;
-    private Long minTimeToNotifyAgain = 3000000L;
+    private Long minTimeToNotifyAgain = 30000L;
     private Gson gson;
     private BroadcastReceiver sentStatusReceiver;
     private BroadcastReceiver deliveredStatusReceiver;

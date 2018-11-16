@@ -122,6 +122,9 @@ public class FallHistoryService extends IntentService {
                     FallHistoryService.this.save(fallHistory);
                 } else {
                     List<Fall> falls = fallHistory.getFalls();
+                    if (falls == null) {
+                        falls = new ArrayList<>();
+                    }
                     falls.add(FallHistoryService.this.newFall());
                     fallHistory.setFalls(falls);
                     FallHistoryService.this.update(fallHistory);
@@ -136,9 +139,9 @@ public class FallHistoryService extends IntentService {
     @NonNull
     private Fall newFall() {
         Fall fall = new Fall();
-//        fall.setDate(new Date());
         fall.setLatitude(0.0);
         fall.setLongitude(0.0);
+        fall.setTimeInMillis(System.currentTimeMillis());
         return fall;
     }
 
