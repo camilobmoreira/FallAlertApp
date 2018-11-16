@@ -100,17 +100,18 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         double acceleration = this.calculateAcceleration(x, y, z);// - SensorManager.GRAVITY_EARTH;
         this.addAccelerometerValuesToList(x, y, z, acceleration);
 
-        Log.d("FDS-Acc-Values", "x: " + x + " y: " + y + " z: " + z + " acc: " + acceleration);
+        String msg = new StringBuilder("x: ").append(x).append(" y: ").append(y).append(" z: ").append(z).append(" acc: ").append(acceleration).toString();
+        Log.d("FDS-Acc-Values", msg);
 
         if (acceleration > CSV_THRESHOLD) {
-            double angleVariation = this.calculateAngleVariation();
-            if (angleVariation > CAV_THRESHOLD) {
-                double changeInAngle = this.calculateChangeInAngle();
-                if (changeInAngle > CCA_THRESHOLD) {
-                    Log.d("FDS-Fall-Happened", "Fall Happened");
+//            double angleVariation = this.calculateAngleVariation();
+//            if (angleVariation > CAV_THRESHOLD) {
+//                double changeInAngle = this.calculateChangeInAngle();
+//                if (changeInAngle > CCA_THRESHOLD) {
+                    Log.d("FDS-Fall-Happened", msg);
                    return true;
-                }
-            }
+//                }
+//            }
         }
         return false;
     }
@@ -130,7 +131,6 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.accelerometerValues.add(map);
     }
 
-    // fixme not working with data from the MobiFall_Dataset_v1.0. Probably something to do with gravity
     private double calculateAcceleration(double x,
                                          double y,
                                          double z) {

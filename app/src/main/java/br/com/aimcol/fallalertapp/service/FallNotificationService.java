@@ -85,7 +85,7 @@ public class FallNotificationService extends IntentService {
                 for (Contact contact : caregiver.getContacts()) {
 //                    switch (contact.getType()) {
 //                        case SMS:
-//                            this.sendSms(contact.getContact(), "Someone fell down");
+//                            this.sendSms(contact.getContact(), elderly.getName() + " fell down");
 //                            break;
 //                    case EMAIL:
 //                        success = this.sendEmail(name, contact);
