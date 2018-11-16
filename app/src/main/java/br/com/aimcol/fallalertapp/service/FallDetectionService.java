@@ -97,21 +97,20 @@ public class FallDetectionService extends IntentService implements SensorEventLi
                                 double y,
                                 double z) {
 
-        double acceleration = this.calculateAcceleration(x, y, z);// - SensorManager.GRAVITY_EARTH;
+        double acceleration = this.calculateAcceleration(x, y, z);
         this.addAccelerometerValuesToList(x, y, z, acceleration);
 
-        String msg = new StringBuilder("x: ").append(x).append(" y: ").append(y).append(" z: ").append(z).append(" acc: ").append(acceleration).toString();
-        Log.d("FDS-Acc-Values", msg);
+        StringBuilder msg =
+                new StringBuilder("x: ").append(x)
+                .append(" y: ").append(y)
+                .append(" z: ").append(z)
+                .append(" acc: ").append(acceleration);
+        Log.d("FDS-Acc-Values", msg.toString());
 
         if (acceleration > CSV_THRESHOLD) {
-//            double angleVariation = this.calculateAngleVariation();
-//            if (angleVariation > CAV_THRESHOLD) {
-//                double changeInAngle = this.calculateChangeInAngle();
-//                if (changeInAngle > CCA_THRESHOLD) {
-                    Log.d("FDS-Fall-Happened", msg);
-                   return true;
-//                }
-//            }
+            msg.append(System.currentTimeMillis());
+            Log.d("FDS-Fall-Happened", msg.toString());
+            return true;
         }
         return false;
     }

@@ -3,6 +3,7 @@ package br.com.aimcol.fallalertapp.service;
 import android.Manifest;
 import android.app.Activity;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -83,17 +84,11 @@ public class FallNotificationService extends IntentService {
         if (this.isOkayToNotifyAgain()) {
             for (Caregiver caregiver : elderly.getCaregivers()) {
                 for (Contact contact : caregiver.getContacts()) {
-//                    switch (contact.getType()) {
-//                        case SMS:
-//                            this.sendSms(contact.getContact(), elderly.getName() + " fell down");
-//                            break;
-//                    case EMAIL:
-//                        success = this.sendEmail(name, contact);
-//                        break;
-//                    case WHATSAPP:
-//                        success = this.sendWhatsapp(name, contact);
-//                        break;
-//                    }
+                    switch (contact.getType()) {
+                        case SMS:
+                            this.sendSms(contact.getContact(), elderly.getName() + " fell down");
+                            break;
+                    }
                 }
             }
             FallNotificationService.this.lastSentInMillis = System.currentTimeMillis();
@@ -115,11 +110,11 @@ public class FallNotificationService extends IntentService {
                 List<String> messages = sms.divideMessage(message);
 
                 for (String msg : messages) {
-//                    PendingIntent sentIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
-//                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
-//                    sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
+                    PendingIntent sentIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
+                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
+                    sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
                 }
-//                FallNotificationService.this.registerBroadcastReceiverForSms();
+                FallNotificationService.this.registerBroadcastReceiverForSms();
             }
         } else {
             throw new RuntimeException("No permission to send SMS");
@@ -156,6 +151,7 @@ public class FallNotificationService extends IntentService {
                         break;
                 }
                 Toast.makeText(FallNotificationService.this.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                FallNotificationService.this.unregisterReceiver(FallNotificationService.this.sentStatusReceiver);
             }
         };
         this.deliveredStatusReceiver = new BroadcastReceiver() {
@@ -171,17 +167,13 @@ public class FallNotificationService extends IntentService {
                         break;
                 }
                 Toast.makeText(FallNotificationService.this.getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                FallNotificationService.this.unregisterReceiver(FallNotificationService.this.deliveredStatusReceiver);
             }
         };
         this.registerReceiver(this.sentStatusReceiver, new IntentFilter(SMS_SENT));
         this.registerReceiver(this.deliveredStatusReceiver, new IntentFilter(SMS_DELIVERED));
     }
 
-
-    public void unregisterBroadcastReceiverForSms() {
-        this.unregisterReceiver(this.sentStatusReceiver);
-        this.unregisterReceiver(this.deliveredStatusReceiver);
-    }
 
 //    private boolean sendWhatsapp(String name,
 //                                 String contact) {
