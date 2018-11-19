@@ -82,11 +82,14 @@ public class FallNotificationService extends IntentService {
 
     private void sendNotification(Elderly elderly) {
         if (this.isOkayToNotifyAgain()) {
+            StringBuilder msg;
             for (Caregiver caregiver : elderly.getCaregivers()) {
+                msg = new StringBuilder();
+                msg.append(caregiver.getName()).append(", ").append(elderly.getName()).append(" fell down.");
                 for (Contact contact : caregiver.getContacts()) {
                     switch (contact.getType()) {
                         case SMS:
-                            this.sendSms(contact.getContact(), elderly.getName() + " fell down");
+                            this.sendSms(contact.getContact(), msg.toString());
                             break;
                     }
                 }

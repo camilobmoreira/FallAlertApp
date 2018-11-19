@@ -149,21 +149,22 @@ public class FallDetectionService extends IntentService implements SensorEventLi
             return -1;
         }
 
-        double anX = this.accelerometerValues.get(size -2).get(AccelerometerAxis.X) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.X);
-        double anY = this.accelerometerValues.get(size -2).get(AccelerometerAxis.Y) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.Y);
-        double anZ = this.accelerometerValues.get(size -2).get(AccelerometerAxis.Z) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.Z);
+        Map<AccelerometerAxis, Double> minusTwo = this.accelerometerValues.get(size - 2);
+        Map<AccelerometerAxis, Double> minusOne = this.accelerometerValues.get(size - 1);
+
+        double anX = minusTwo.get(AccelerometerAxis.X) * minusOne.get(AccelerometerAxis.X);
+        double anY = minusTwo.get(AccelerometerAxis.Y) * minusOne.get(AccelerometerAxis.Y);
+        double anZ = minusTwo.get(AccelerometerAxis.Z) * minusOne.get(AccelerometerAxis.Z);
         double an = anX + anY + anZ;
 
-//        double an = this.accelerometerValues.get(size -2).get(AccelerometerAxis.ACCELERATION) * this.accelerometerValues.get(size -1).get(AccelerometerAxis.ACCELERATION);
-
-        double anX0 = Math.pow(this.accelerometerValues.get(size -2).get(AccelerometerAxis.X), 2);
-        double anY0 = Math.pow(this.accelerometerValues.get(size -2).get(AccelerometerAxis.Y), 2);
-        double anZ0 = Math.pow(this.accelerometerValues.get(size -2).get(AccelerometerAxis.Z), 2);
+        double anX0 = Math.pow(minusTwo.get(AccelerometerAxis.X), 2);
+        double anY0 = Math.pow(minusTwo.get(AccelerometerAxis.Y), 2);
+        double anZ0 = Math.pow(minusTwo.get(AccelerometerAxis.Z), 2);
         double an0 = Math.sqrt(anX0 + anY0 + anZ0);
 
-        double anX1 = Math.pow(this.accelerometerValues.get(size -1).get(AccelerometerAxis.X), 2);
-        double anY1 = Math.pow(this.accelerometerValues.get(size -1).get(AccelerometerAxis.Y), 2);
-        double anZ1 = Math.pow(this.accelerometerValues.get(size -1).get(AccelerometerAxis.Z), 2);
+        double anX1 = Math.pow(minusOne.get(AccelerometerAxis.X), 2);
+        double anY1 = Math.pow(minusOne.get(AccelerometerAxis.Y), 2);
+        double anZ1 = Math.pow(minusOne.get(AccelerometerAxis.Z), 2);
         double an1 = Math.sqrt(anX1 + anY1 + anZ1);
 
         double a = an / (an0 * an1);
@@ -176,13 +177,19 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         if (size < 4){
             return -1;
         }
-        double aX = this.accelerometerValues.get(0).get(AccelerometerAxis.X) * this.accelerometerValues.get(3).get(AccelerometerAxis.X);
-        double aY = this.accelerometerValues.get(0).get(AccelerometerAxis.Y) * this.accelerometerValues.get(3).get(AccelerometerAxis.Y);
-        double aZ = this.accelerometerValues.get(0).get(AccelerometerAxis.Z) * this.accelerometerValues.get(3).get(AccelerometerAxis.Z);
+        Map<AccelerometerAxis, Double> first = this.accelerometerValues.get(0);
+        Map<AccelerometerAxis, Double> third = this.accelerometerValues.get(3);
+
+        double aX = first.get(AccelerometerAxis.X) * third.get(AccelerometerAxis.X);
+        double aY = first.get(AccelerometerAxis.Y) * third.get(AccelerometerAxis.Y);
+        double aZ = first.get(AccelerometerAxis.Z) * third.get(AccelerometerAxis.Z);
 
         double a0 = aX + aY + aZ;
 
-        double a1 = (Math.sqrt(Math.pow(aX, 2)) + Math.sqrt(Math.pow(aY, 2)) + Math.sqrt(Math.pow(aZ, 2)));
+        aX = Math.pow(aX, 2);
+        aY = Math.pow(aY, 2);
+        aZ = Math.pow(aZ, 2);
+        double a1 = (Math.sqrt(aX) + Math.sqrt(aY) + Math.sqrt(aZ));
 
         return Math.acos(a0 / a1) * (180 / Math.PI);
     }
