@@ -96,7 +96,8 @@ public class FallNotificationService extends IntentService {
             }
             FallNotificationService.this.lastSentInMillis = System.currentTimeMillis();
         } else {
-            Toast.makeText(this.getApplicationContext(), "Not long enough since last notification", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getApplicationContext(),
+                    "Not long enough since last notification", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -105,16 +106,17 @@ public class FallNotificationService extends IntentService {
 
         if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS)) {
             if (contact.isEmpty()) {
-                Toast.makeText(this.getApplicationContext(), "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getApplicationContext(),
+                        "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
             } else {
-
                 SmsManager sms = SmsManager.getDefault();
                 // if message length is too long, messages are divided
                 List<String> messages = sms.divideMessage(message);
-
                 for (String msg : messages) {
-                    PendingIntent sentIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
-                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
+                    PendingIntent sentIntent = PendingIntent.getBroadcast(
+                            FallNotificationService.this, 0, new Intent(SMS_SENT), 0);
+                    PendingIntent deliveredIntent = PendingIntent.getBroadcast(
+                            FallNotificationService.this, 0, new Intent(SMS_DELIVERED), 0);
                     sms.sendTextMessage(contact, null, msg, sentIntent, deliveredIntent);
                 }
                 FallNotificationService.this.registerBroadcastReceiverForSms();
