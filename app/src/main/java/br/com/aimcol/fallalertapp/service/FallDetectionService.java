@@ -100,8 +100,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         double acceleration = this.calculateAcceleration(x, y, z);
         this.addAccelerometerValuesToList(x, y, z, acceleration);
 
-        StringBuilder msg =
-                new StringBuilder("x: ").append(x)
+        StringBuilder msg = new StringBuilder("x: ").append(x)
                 .append(" y: ").append(y)
                 .append(" z: ").append(z)
                 .append(" acc: ").append(acceleration);

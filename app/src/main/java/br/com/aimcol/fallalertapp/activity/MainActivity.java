@@ -6,9 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -31,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_SMS = 0;
 
+    private static final ImmutableList<String> PERMISSIONS = new ImmutableList.Builder<String>()
+            .add(Manifest.permission.SEND_SMS)
+            .add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            .add(Manifest.permission.ACCESS_FINE_LOCATION)
+//            .add(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            .build();
+
     private BroadcastReceiver mBroadcastReceiver;
     private User user;
     private Gson gson;
@@ -41,8 +50,9 @@ public class MainActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_main);
 
         // Request permissions
-        PermissionUtils.requestPermission(this, Manifest.permission.SEND_SMS, REQUEST_SMS);
-//        PermissionUtils.requestPermissionOnSettings(this, Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        for (String permission : PERMISSIONS) {
+            PermissionUtils.requestPermission(this, Manifest.permission.SEND_SMS, REQUEST_SMS);
+        }
 
         // Initiate variables
         RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory

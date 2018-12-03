@@ -1,15 +1,20 @@
 package br.com.aimcol.fallalertapp.service;
 
+import android.Manifest;
 import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +26,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import br.com.aimcol.fallalertapp.dto.ElderlyDTO;
 import br.com.aimcol.fallalertapp.model.Elderly;
@@ -29,6 +35,7 @@ import br.com.aimcol.fallalertapp.model.FallHistory;
 import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
 import br.com.aimcol.fallalertapp.util.BroadcastReceiverUtils;
+import br.com.aimcol.fallalertapp.util.PermissionUtils;
 import br.com.aimcol.fallalertapp.util.RuntimeTypeAdapterFactory;
 
 public class FallHistoryService extends IntentService {
@@ -40,6 +47,7 @@ public class FallHistoryService extends IntentService {
     public static final String FALL_HISTORY_ACTION_LOAD_BY_ELDERLY_KEY = "FallHistory#loadByElderlyUserKey";
     public static final String FALL_HISTORY_ACTION_REGISTER_NEW_FALL = "FallHistory#registerNewFall";
 
+    private FusedLocationProviderClient mFusedLocationClient;
     private BroadcastReceiver mBroadcastReceiver;
     private DatabaseReference mDatabase;
     private Gson gson;
@@ -67,6 +75,8 @@ public class FallHistoryService extends IntentService {
                               int flags,
                               int startId) {
 
+        this.mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         RuntimeTypeAdapterFactory<Person> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(Person.class, "type")
                 .registerSubtype(Elderly.class, Elderly.class.getSimpleName());
@@ -77,7 +87,6 @@ public class FallHistoryService extends IntentService {
         String userJson = intent.getStringExtra(User.USER_JSON);
         String action = intent.getStringExtra("action");
         User user = this.gson.fromJson(userJson, User.class);
-
 
         //CrudAction action = (CrudAction) intent.getSerializableExtra("crudAction");
         switch (action) {
@@ -142,6 +151,25 @@ public class FallHistoryService extends IntentService {
         fall.setLatitude(0.0);
         fall.setLongitude(0.0);
         fall.setTimeInMillis(System.currentTimeMillis());
+
+        if (PermissionUtils.checkPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                || PermissionUtils.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            this.mFusedLocationClient.getLastLocation()
+                    // Change this to an activity if this doesn't work
+                    //.addOnSuccessListener((Executor) FallHistoryService.this, new OnSuccessListener<Location>() {
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                fall.setLatitude(location.getLatitude());
+                                fall.setLongitude(location.getLongitude());
+                            }
+                        }
+                    });
+        }
+
         return fall;
     }
 
