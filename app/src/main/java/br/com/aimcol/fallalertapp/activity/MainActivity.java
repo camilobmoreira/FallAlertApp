@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
@@ -79,10 +81,16 @@ public class MainActivity extends AppCompatActivity {
             FallDetectionService.startFallDetectionService(userJson, this);
             this.setTextViewTo("Fall Detection Service Running");
         } else {
-            //fixme remove from else and set the TextViews text to Elderly properties for editing an existing Elderly
-            String elderlyJson = this.gson.toJson(elderly);
-            this.startNewElderlyActivity(elderlyJson, this);
+            this.setTextViewTo("Fall Detection Service is not Running");
         }
+        Button editElderyButton = this.findViewById(R.id.edit_elderly_button);
+        editElderyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String elderlyJson = MainActivity.this.gson.toJson(elderly);
+                MainActivity.this.startNewElderlyActivity(elderlyJson, MainActivity.this);
+            }
+        });
     }
 
     private void startNewElderlyActivity(String elderlyJson,
