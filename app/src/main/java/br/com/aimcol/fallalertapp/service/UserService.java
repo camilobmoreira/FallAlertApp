@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
@@ -119,9 +120,9 @@ public class UserService extends IntentService {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(UserService.this, "Success", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UserService.this, UserService.super.getString(R.string.success), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(UserService.this, "Failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UserService.this, UserService.super.getString(R.string.failed), Toast.LENGTH_LONG).show();
                     Log.e("update", task.getException().getMessage());
                 }
             }
@@ -140,9 +141,9 @@ public class UserService extends IntentService {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(UserService.this, "Success", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UserService.this, UserService.super.getString(R.string.success), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(UserService.this, "Failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UserService.this, UserService.super.getString(R.string.failed), Toast.LENGTH_LONG).show();
                     Log.e("delete", task.getException().getMessage());
                 }
             }

@@ -23,6 +23,8 @@ import br.com.aimcol.fallalertapp.model.Elderly;
 
 public class NewElderlyActivity extends AppCompatActivity {
 
+    public static final int REQUEST_CODE = ((Integer) NewElderlyActivity.class.hashCode()).shortValue();
+
     private Elderly elderly;
     private Gson gson;
     private ListView caregiverListView;

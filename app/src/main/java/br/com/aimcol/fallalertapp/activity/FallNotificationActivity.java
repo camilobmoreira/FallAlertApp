@@ -26,20 +26,20 @@ public class FallNotificationActivity extends AppCompatActivity {
         Intent intent = super.getIntent();
         String userJson = intent.getStringExtra(User.USER_JSON);
 
-        DialogUtils.generateDialog(this, "Fall Happened", "Send notification?", new DialogInterface.OnClickListener() {
+        DialogUtils.generateDialog(this, super.getString(R.string.fall_happened), super.getString(R.string.send_notification), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d("FNA-Send-Notification", "Sending Fall Notification");
                 FallNotificationService.startFallNotificationService(FallNotificationActivity.this, userJson);
                 FallNotificationActivity.this.finish();
             }
-        }, "Send", new DialogInterface.OnClickListener() {
+        }, super.getString(R.string.send), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 FallNotificationActivity.this.finish();
             }
-        }, "I'm okay. Cancel").show();
+        }, super.getString(R.string.i_am_okay_cancel)).show();
 
     }
 

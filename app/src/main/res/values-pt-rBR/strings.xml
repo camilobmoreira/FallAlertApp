@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aplicativo de detecção de quedas</string>
+    <string name="fall_detection_service_running">Serviço de detecção de quedas está em execução</string>
+    <string name="fall_detection_service_not_running">Serviço de detecção de quedas não está em execução</string>
+    <string name="fall_happened">Ocorreu uma queda</string>
+    <string name="send_notification">Enviar notificação?</string>
+    <string name="error_field_required">Este campo é obrigatório</string>
+    <string name="title_activity_configurations">Configurações</string>
+    <string name="error_passwords_dont_match">Senha e confirmação de senha não conferem</string>
+    <string name="error_invalid_password">A senha é muito curta</string>
+    <string name="error_incorrect_password">A senha está incorreta</string>
+    <string name="error_invalid_email">Este endereço de e-mail não é válido</string>
+    <string name="action_sign_in_short">Entrar</string>
+    <string name="action_sign_in">Entrar</string>
+    <string name="action_sign_up">Inscrever-se</string>
+    <string name="prompt_password">Senha</string>
+    <string name="prompt_password_confirmation">Confirmação de senha</string>
+    <string name="prompt_email">E-mail</string>
+    <string name="title_activity_login">Entrar</string>
+    <string name="i_am_okay_cancel">Estou bem. Cancelar</string>
+    <string name="send">Enviar</string>
+    <string name="authentication_failed">Autenticação falhou.</string>
+    <string name="accelerometer_not_found">Acelerometro não encontrado</string>
+    <string name="success">Successo</string>
+    <string name="failed">Falhou</string>
+    <string name="fell_down_message">caiu.</string>
+    <string name="not_long_enough_since_last_notification">Não passou tempo o suficiente desde a última notificação</string>
+    <string name="please_enter_a_valid_phone_number">Por favor, entre com um número de telefone válido</string>
+    <string name="no_permission_to_send_sms">Sem permissão para enviar SMG</string>
+    <string name="unknown_error">Erro desconhecido</string>
+    <string name="message_sent_succesfully">Mensagem enviada com sucesso!!</string>
+    <string name="generic_failure_error">Erro genérico</string>
+    <string name="error_no_service">Erro: Sem serviço</string>
+    <string name="message_not_delivered">Mensagem não entregue</string>
+    <string name="message_delivered_succesfully">Mensagem entregue com sucesso</string>
+</resources>

@@ -181,7 +181,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("login", "signInWithEmail:failure", task.getException());
-                        Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, LoginActivity.super.getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
                         LoginActivity.this.showProgress(false);
                         LoginActivity.this.mPasswordView.setText("");
                     }
@@ -224,7 +224,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     } else {
                         // If sign up fails, display a message to the user.
                         Log.w("signup", "createUserWithEmail:failure", task.getException());
-                        Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, LoginActivity.super.getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
                         LoginActivity.this.showProgress(false);
                         LoginActivity.this.mPasswordView.setText("");
                         LoginActivity.this.mPasswordConfirmationView.setText("");

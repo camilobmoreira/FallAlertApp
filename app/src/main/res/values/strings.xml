@@ -14,7 +14,27 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_passwords_dont_match">Password and password confirmation don\'t match</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="title_activity_configurations">Configurations</string>
+    <string name="fall_detection_service_running">Fall Detection Service Running</string>
+    <string name="fall_detection_service_not_running">Fall Detection Service is not Running</string>
+    <string name="fall_happened">Fall Happened</string>
+    <string name="send_notification">Send notification?</string>
+    <string name="i_am_okay_cancel">I\'m okay. Cancel</string>
+    <string name="send">Send</string>
+    <string name="authentication_failed">Authentication failed.</string>
+    <string name="accelerometer_not_found">Accelerometer not found</string>
+    <string name="success">Success</string>
+    <string name="failed">Failed</string>
+    <string name="fell_down_message">fell down.</string>
+    <string name="not_long_enough_since_last_notification">Not long enough since last notification</string>
+    <string name="please_enter_a_valid_phone_number">Please Enter a Valid Phone Number</string>
+    <string name="no_permission_to_send_sms">No permission to send SMS</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="message_sent_succesfully">Message Sent Successfully!!</string>
+    <string name="generic_failure_error">Generic Failure Error</string>
+    <string name="error_no_service">Error: No Service Available</string>
+    <string name="error_null_pdu">Error: Null PDU</string>
+    <string name="error_radio_off">Error: Radio is off</string>
+    <string name="message_not_delivered">Message Not Delivered</string>
+    <string name="message_delivered_succesfully">Message Delivered Successfully</string>
 </resources>
