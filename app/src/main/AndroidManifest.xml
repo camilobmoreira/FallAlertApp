@@ -11,8 +11,8 @@
 
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -43,7 +43,10 @@
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.NewCaregiverActivity" />
         <activity android:name=".activity.NewElderlyActivity" />
-        <activity android:name=".activity.FallNotificationActivity"></activity>
+        <activity android:name=".activity.FallNotificationActivity" />
+        <activity
+            android:name=".activity.ConfigurationsActivity"
+            android:label="@string/title_activity_configurations"></activity>
     </application>
 
 </manifest>

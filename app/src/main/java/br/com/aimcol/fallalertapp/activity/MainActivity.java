@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -53,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Request permissions
         for (String permission : PERMISSIONS) {
-            PermissionUtils.requestPermission(this, Manifest.permission.SEND_SMS, REQUEST_SMS);
+            PermissionUtils.requestPermission(this, permission, permission.hashCode());
         }
 
         // Initiate variables
@@ -79,11 +78,11 @@ public class MainActivity extends AppCompatActivity {
         // Initiate FallDetectionService
         if (this.isReadyToStartFallDetectionService()) {
             FallDetectionService.startFallDetectionService(userJson, this);
-            this.setTextViewTo("Fall Detection Service Running");
+            this.setTextViewTo(super.getString(R.string.fall_detection_service_running));
         } else {
-            this.setTextViewTo("Fall Detection Service is not Running");
+            this.setTextViewTo(super.getString(R.string.fall_detection_service_not_running));
         }
-        Button editElderyButton = this.findViewById(R.id.edit_elderly_button);
+        Button editElderyButton = super.findViewById(R.id.edit_elderly_button);
         editElderyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +90,31 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startNewElderlyActivity(elderlyJson, MainActivity.this);
             }
         });
+
+        Button editConfigsButton = super.findViewById(R.id.edit_config_button);
+        editConfigsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userJson = MainActivity.this.gson.toJson(MainActivity.this.user);
+                MainActivity.this.startConfigurationsActivity(MainActivity.this, userJson);
+            }
+        });
+    }
+
+    private void startConfigurationsActivity(Context context, String userJson) {
+        this.mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //fixme change to a better location
+                String updateUserJson = intent.getStringExtra(User.USER_JSON);
+                MainActivity.this.user = MainActivity.this.gson.fromJson(updateUserJson, User.class);
+                MainActivity.super.unregisterReceiver(MainActivity.this.mBroadcastReceiver);
+            }
+        };
+
+        Intent newConfigurationsActivityIntent = new Intent(context, ConfigurationsActivity.class);
+        newConfigurationsActivityIntent.putExtra(User.USER_JSON, userJson);
+        this.startActivityForResult(newConfigurationsActivityIntent, ConfigurationsActivity.REQUEST_CODE);
     }
 
     private void startNewElderlyActivity(String elderlyJson,
@@ -108,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent newElderlyActivityIntent = new Intent(context, NewElderlyActivity.class);
         newElderlyActivityIntent.putExtra(Elderly.ELDERLY_JSON, elderlyJson);
-        this.startActivityForResult(newElderlyActivityIntent, 1);
+        this.startActivityForResult(newElderlyActivityIntent, NewElderlyActivity.REQUEST_CODE);
     }
 
     private boolean isReadyToStartFallDetectionService() {
@@ -138,20 +162,27 @@ public class MainActivity extends AppCompatActivity {
                                  Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
+        if (resultCode == Activity.RESULT_OK && requestCode == NewElderlyActivity.REQUEST_CODE) {
             String elderlyJson = data.getStringExtra(Elderly.ELDERLY_JSON);
             this.user.setPerson(this.gson.fromJson(elderlyJson, Elderly.class));
             String userJson = this.gson.toJson(this.user);
             BroadcastReceiverUtils.registerBroadcastReceiver(this, this.mBroadcastReceiver, UserService.USER_SERVICE_ACTION_UPDATE);
             UserService.startUserService(userJson, CrudAction.UPDATE, this);
-            this.setTextViewTo(elderlyJson);
+            if (this.isReadyToStartFallDetectionService()) {
+                FallDetectionService.startFallDetectionService(userJson, this);
+                this.setTextViewTo(super.getString(R.string.fall_detection_service_running));
+            }
+        } else if (resultCode == Activity.RESULT_OK && requestCode == ConfigurationsActivity.REQUEST_CODE) {
+            String userJson = data.getStringExtra(User.USER_JSON);
+            BroadcastReceiverUtils.registerBroadcastReceiver(this, this.mBroadcastReceiver, UserService.USER_SERVICE_ACTION_UPDATE);
+            UserService.startUserService(userJson, CrudAction.UPDATE, this);
         }
     }
 
     //fixme Just to see if everything is okay
-    private void setTextViewTo(String elderlyJson) {
+    private void setTextViewTo(String text) {
         TextView textView = super.findViewById(R.id.hello_world_text_view);
-        textView.setText(elderlyJson);
+        textView.setText(text);
     }
 
     public static void startMainActivitySendUser(String userJson,

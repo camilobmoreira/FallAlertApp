@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.activity.FallNotificationActivity;
+import br.com.aimcol.fallalertapp.model.Configuration;
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Person;
 import br.com.aimcol.fallalertapp.model.User;
@@ -87,7 +89,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         if (this.isFallDetected(x, y, z)) {
             if (this.isOkayToNotifyAgain()) {
                 this.lastSentInMillis = System.currentTimeMillis();
-                Toast.makeText(this, "Fall", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, super.getString(R.string.fall_happened), Toast.LENGTH_LONG).show();
                 FallNotificationActivity.startFallNotificationActivity(this, this.gson.toJson(this.user));
             }
         }
@@ -198,6 +200,9 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         if (this.user == null) {
             String userJson = intent.getStringExtra(User.USER_JSON);
             this.user = this.gson.fromJson(userJson, User.class);
+            Long minTime = (Long) this.user.getConfigurations().get(Configuration.MIN_TIME_TO_NOTIFY_AGAIN);
+            this.minTimeToNotifyAgain = minTime != null ? minTime : this.minTimeToNotifyAgain;
+
         }
     }
 
@@ -221,7 +226,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.mSensorManager = (SensorManager) super.getSystemService(Context.SENSOR_SERVICE);
         this.mAccelerometer = this.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (this.mAccelerometer == null) {
-            throw new RuntimeException("Acelerometro não encontrado");
+            throw new RuntimeException(super.getString(R.string.accelerometer_not_found));
         }
 
         this.mSensorManager.registerListener(this, this.mAccelerometer, ACCELEROMETER_SAMPLING_PERIOD);

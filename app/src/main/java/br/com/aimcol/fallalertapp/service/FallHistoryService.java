@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.dto.ElderlyDTO;
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Fall;
@@ -155,19 +156,10 @@ public class FallHistoryService extends IntentService {
         if (PermissionUtils.checkPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 || PermissionUtils.checkPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-            this.mFusedLocationClient.getLastLocation()
-                    // Change this to an activity if this doesn't work
-                    //.addOnSuccessListener((Executor) FallHistoryService.this, new OnSuccessListener<Location>() {
-                    .addOnSuccessListener(new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                fall.setLatitude(location.getLatitude());
-                                fall.setLongitude(location.getLongitude());
-                            }
-                        }
-                    });
+            //TODO test this
+            Location location = this.mFusedLocationClient.getLastLocation().getResult();
+            fall.setLatitude(location.getLatitude());
+            fall.setLongitude(location.getLongitude());
         }
 
         return fall;
@@ -247,9 +239,9 @@ public class FallHistoryService extends IntentService {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(FallHistoryService.this, "Success", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FallHistoryService.this, FallHistoryService.super.getString(R.string.success), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(FallHistoryService.this, "Failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FallHistoryService.this, FallHistoryService.super.getString(R.string.failed), Toast.LENGTH_LONG).show();
                     Log.e("update", task.getException().getMessage());
                 }
             }
@@ -268,9 +260,9 @@ public class FallHistoryService extends IntentService {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(FallHistoryService.this, "Success", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FallHistoryService.this, FallHistoryService.super.getString(R.string.success), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(FallHistoryService.this, "Failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FallHistoryService.this, FallHistoryService.super.getString(R.string.failed), Toast.LENGTH_LONG).show();
                     Log.e("update", task.getException().getMessage());
                 }
             }

@@ -19,7 +19,9 @@ import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
+import br.com.aimcol.fallalertapp.R;
 import br.com.aimcol.fallalertapp.model.Caregiver;
+import br.com.aimcol.fallalertapp.model.Configuration;
 import br.com.aimcol.fallalertapp.model.Contact;
 import br.com.aimcol.fallalertapp.model.Elderly;
 import br.com.aimcol.fallalertapp.model.Person;
@@ -39,6 +41,7 @@ public class FallNotificationService extends IntentService {
     private Gson gson;
     private BroadcastReceiver sentStatusReceiver;
     private BroadcastReceiver deliveredStatusReceiver;
+    private User user;
 
     public FallNotificationService() {
         super(".FallNotificationService");
@@ -73,8 +76,12 @@ public class FallNotificationService extends IntentService {
 
         if (intent != null) {
             String userJson = intent.getStringExtra(User.USER_JSON);
-            User user = this.gson.fromJson(userJson, User.class);
-            this.sendNotification((Elderly) user.getPerson());
+            this.user = this.gson.fromJson(userJson, User.class);
+
+            Long minTime = (Long) this.user.getConfigurations().get(Configuration.MIN_TIME_TO_NOTIFY_AGAIN);
+            this.minTimeToNotifyAgain = minTime != null ? minTime : this.minTimeToNotifyAgain;
+
+            this.sendNotification((Elderly) this.user.getPerson());
             FallHistoryService.startFallHistoryService(userJson, FallHistoryService.FALL_HISTORY_ACTION_REGISTER_NEW_FALL, this);
         }
         return super.onStartCommand(intent, flags, startId);
@@ -82,14 +89,19 @@ public class FallNotificationService extends IntentService {
 
     private void sendNotification(Elderly elderly) {
         if (this.isOkayToNotifyAgain()) {
-            StringBuilder msg;
+            StringBuilder msg = null;
+            String customMsg = (String) this.user.getConfigurations().get(Configuration.CUSTOM_MSG_FOR_FALL_EVENT);
+            boolean customMsgIsNullOrEmpty = customMsg == null || customMsg.isEmpty();
             for (Caregiver caregiver : elderly.getCaregivers()) {
-                msg = new StringBuilder();
-                msg.append(caregiver.getName()).append(", ").append(elderly.getName()).append(" fell down.");
+                if (customMsgIsNullOrEmpty) {
+                    msg = new StringBuilder();
+                    msg.append(caregiver.getName()).append(", ").append(elderly.getName())
+                            .append(" ").append(super.getString(R.string.fell_down_message));
+                }
                 for (Contact contact : caregiver.getContacts()) {
                     switch (contact.getType()) {
                         case SMS:
-                            this.sendSms(contact.getContact(), msg.toString());
+                            this.sendSms(contact.getContact(), msg == null ? customMsg : msg.toString());
                             break;
                     }
                 }
@@ -97,7 +109,7 @@ public class FallNotificationService extends IntentService {
             FallNotificationService.this.lastSentInMillis = System.currentTimeMillis();
         } else {
             Toast.makeText(this.getApplicationContext(),
-                    "Not long enough since last notification", Toast.LENGTH_SHORT).show();
+                    super.getString(R.string.not_long_enough_since_last_notification), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -107,7 +119,7 @@ public class FallNotificationService extends IntentService {
         if (PermissionUtils.checkPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS)) {
             if (contact.isEmpty()) {
                 Toast.makeText(this.getApplicationContext(),
-                        "Please Enter a Valid Phone Number", Toast.LENGTH_SHORT).show();
+                        super.getString(R.string.please_enter_a_valid_phone_number), Toast.LENGTH_SHORT).show();
             } else {
                 SmsManager sms = SmsManager.getDefault();
                 // if message length is too long, messages are divided
@@ -122,7 +134,7 @@ public class FallNotificationService extends IntentService {
                 FallNotificationService.this.registerBroadcastReceiverForSms();
             }
         } else {
-            throw new RuntimeException("No permission to send SMS");
+            throw new RuntimeException(super.getString(R.string.no_permission_to_send_sms));
         }
     }
 
@@ -135,22 +147,22 @@ public class FallNotificationService extends IntentService {
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                String message = "Unknown Error";
+                String message = FallNotificationService.super.getString(R.string.unknown_error);
                 switch (this.getResultCode()) {
                     case Activity.RESULT_OK:
-                        message = "Message Sent Successfully !!";
+                        message = FallNotificationService.super.getString(R.string.message_sent_succesfully);
                         break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        message = "Generic Failure Error";
+                        message = FallNotificationService.super.getString(R.string.generic_failure_error);
                         break;
                     case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        message = "Error: No Service Available";
+                        message = FallNotificationService.super.getString(R.string.error_no_service);
                         break;
                     case SmsManager.RESULT_ERROR_NULL_PDU:
-                        message = "Error: Null PDU";
+                        message = FallNotificationService.super.getString(R.string.error_null_pdu);
                         break;
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        message = "Error: Radio is off";
+                        message = FallNotificationService.super.getString(R.string.error_radio_off);
                         break;
                     default:
                         break;
@@ -163,10 +175,10 @@ public class FallNotificationService extends IntentService {
 
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                String message = "Message Not Delivered";
+                String message = FallNotificationService.super.getString(R.string.message_not_delivered);
                 switch (this.getResultCode()) {
                     case Activity.RESULT_OK:
-                        message = "Message Delivered Successfully";
+                        message = FallNotificationService.super.getString(R.string.message_delivered_succesfully);
                         break;
                     case Activity.RESULT_CANCELED:
                         break;
