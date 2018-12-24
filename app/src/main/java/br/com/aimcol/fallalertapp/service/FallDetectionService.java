@@ -99,7 +99,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
                                 double y,
                                 double z) {
 
-        double acceleration = this.calculateAcceleration(x, y, z);
+        double acceleration = this.calculateSumVector(x, y, z);
         this.addAccelerometerValuesToList(x, y, z, acceleration);
 
         StringBuilder msg = new StringBuilder("x: ").append(x)
@@ -138,7 +138,7 @@ public class FallDetectionService extends IntentService implements SensorEventLi
         this.accelerometerValues.add(map);
     }
 
-    private double calculateAcceleration(double x,
+    private double calculateSumVector(double x,
                                          double y,
                                          double z) {
         return Math.abs(x) + Math.abs(y) + Math.abs(z);
