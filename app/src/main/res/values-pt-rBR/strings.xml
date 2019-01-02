@@ -34,4 +34,5 @@
     <string name="error_no_service">Erro: Sem serviço</string>
     <string name="message_not_delivered">Mensagem não entregue</string>
     <string name="message_delivered_succesfully">Mensagem entregue com sucesso</string>
+    <string name="save">Salvar</string>
 </resources>

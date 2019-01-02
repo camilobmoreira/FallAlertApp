@@ -13,7 +13,10 @@ import android.widget.ListView;
 import com.google.android.gms.common.util.CollectionUtils;
 import com.google.gson.Gson;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import br.com.aimcol.fallalertapp.R;
@@ -23,7 +26,7 @@ import br.com.aimcol.fallalertapp.model.Elderly;
 
 public class NewElderlyActivity extends AppCompatActivity {
 
-    public static final int REQUEST_CODE = ((Integer) NewElderlyActivity.class.hashCode()).shortValue();
+    public static final int REQUEST_CODE = 1;
 
     private Elderly elderly;
     private Gson gson;
@@ -45,14 +48,16 @@ public class NewElderlyActivity extends AppCompatActivity {
         nameEditText.setText(this.elderly.getName());
 
 //        EditText birthEditText = super.findViewById(R.id.birth_edit_text);
-//        birthEditText.setText(this.elderly.getBirthDate());
+//        Date date = new Date(this.elderly.getBirthDateAsLong());
+//        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//        birthEditText.setText(dateFormat.format(date));
 
         Button addNewCaregiverButton = super.findViewById(R.id.add_caregiver_button);
         addNewCaregiverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent newCaregiverIntent = new Intent(NewElderlyActivity.this, NewCaregiverActivity.class);
-                NewElderlyActivity.super.startActivityForResult(newCaregiverIntent, 1);
+                NewElderlyActivity.super.startActivityForResult(newCaregiverIntent, NewCaregiverActivity.REQUEST_CODE);
             }
         });
 
@@ -60,6 +65,8 @@ public class NewElderlyActivity extends AppCompatActivity {
         saveElderlyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NewElderlyActivity.this.elderly.setName(nameEditText.getText().toString());
+//                NewElderlyActivity.this.elderly.setBirthDateAsLong(Long.parseLong(birthEditText.getText().toString()));
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra(Elderly.ELDERLY_JSON, NewElderlyActivity.this.gson.toJson(NewElderlyActivity.this.elderly));
                 NewElderlyActivity.this.setResult(Activity.RESULT_OK, resultIntent);
@@ -82,7 +89,7 @@ public class NewElderlyActivity extends AppCompatActivity {
                                  Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
+        if (resultCode == Activity.RESULT_OK && requestCode == NewCaregiverActivity.REQUEST_CODE) {
             String caregiverJson = data.getStringExtra(Caregiver.CAREGIVER_JSON);
             this.elderly.getCaregivers().add(this.gson.fromJson(caregiverJson, Caregiver.class));
             ((BaseAdapter) this.caregiverListView.getAdapter()).notifyDataSetChanged();

@@ -23,6 +23,8 @@ import br.com.aimcol.fallalertapp.model.ContactType;
 
 public class NewCaregiverActivity extends AppCompatActivity {
 
+    public static final int REQUEST_CODE = 3;
+
     private Caregiver caregiver;
     private Gson gson;
 

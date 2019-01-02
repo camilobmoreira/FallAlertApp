@@ -4,13 +4,14 @@ import lombok.Getter;
 
 public enum Configuration {
 
-    MIN_TIME_TO_NOTIFY_AGAIN("Min time to send another notification"),
-    CUSTOM_MSG_FOR_FALL_EVENT("Message to send to caregiver when a fall happens");
+    MIN_TIME_TO_NOTIFY_AGAIN(30000L),
+    CUSTOM_MSG_FOR_FALL_EVENT(null),
+    DATE_FORMAT("MM/dd/yyyy");
 
     @Getter
-    private String text;
+    private Object defaultValue;
 
-    Configuration(String text) {
-        this.text = text;
+    Configuration(Object defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

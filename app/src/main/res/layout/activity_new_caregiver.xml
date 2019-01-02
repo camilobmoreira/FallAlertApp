@@ -76,7 +76,7 @@
                 android:id="@+id/save_caregiver_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save" />
+                android:text="@string/save" />
         </TableRow>
     </TableLayout>
 

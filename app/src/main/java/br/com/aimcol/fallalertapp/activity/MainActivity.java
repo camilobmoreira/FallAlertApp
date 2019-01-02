@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         if (this.user.getPerson() == null) {
             this.user.setPerson(new Elderly());
         }
-        Elderly elderly = (Elderly) this.user.getPerson();
         if (userJson == null) {
             userJson = this.gson.toJson(this.user);
         }
@@ -86,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         editElderyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String elderlyJson = MainActivity.this.gson.toJson(elderly);
+                String elderlyJson = MainActivity.this.gson.toJson(MainActivity.this.user.getPerson());
                 MainActivity.this.startNewElderlyActivity(elderlyJson, MainActivity.this);
             }
         });

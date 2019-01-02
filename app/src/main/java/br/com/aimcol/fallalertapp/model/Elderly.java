@@ -13,6 +13,6 @@ public class Elderly extends Person {
         super(Elderly.class.getSimpleName());
     }
 
-//  private LocalDate birthday;
+    private Long birthDateAsLong;
     private List<Caregiver> caregivers;
 }

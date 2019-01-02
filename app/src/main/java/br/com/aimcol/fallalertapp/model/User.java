@@ -1,7 +1,7 @@
 package br.com.aimcol.fallalertapp.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Data;
 
@@ -13,5 +13,5 @@ public class User {
     private String key;
     private String email;
     private Person person;
-    private Map<Configuration, Object> configurations = new HashMap<>();
+    private List<UserConfiguration> configurations = new ArrayList<>();
 }

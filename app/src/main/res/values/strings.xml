@@ -37,4 +37,5 @@
     <string name="error_radio_off">Error: Radio is off</string>
     <string name="message_not_delivered">Message Not Delivered</string>
     <string name="message_delivered_succesfully">Message Delivered Successfully</string>
+    <string name="save">Save</string>
 </resources>
